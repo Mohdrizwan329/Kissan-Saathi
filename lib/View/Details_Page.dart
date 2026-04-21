@@ -330,7 +330,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.grey.withValues(alpha: 0.2),
+                                        color: Colors.grey.withValues(
+                                          alpha: 0.2,
+                                        ),
                                         spreadRadius: 1,
                                         blurRadius: 3,
                                         offset: Offset(0, 2),
@@ -493,7 +495,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                             vertical: screenHeight * 0.005,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: Colors.red.withValues(alpha: 0.2),
+                                            color: Colors.red.withValues(
+                                              alpha: 0.2,
+                                            ),
                                             borderRadius: BorderRadius.circular(
                                               6,
                                             ),
@@ -513,7 +517,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                                             vertical: screenHeight * 0.005,
                                           ),
                                           decoration: BoxDecoration(
-                                            color: Colors.amber.withValues(alpha: 0.2),
+                                            color: Colors.amber.withValues(
+                                              alpha: 0.2,
+                                            ),
                                             borderRadius: BorderRadius.circular(
                                               20,
                                             ),

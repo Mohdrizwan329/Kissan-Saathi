@@ -16,6 +16,8 @@ import 'package:indian_farmer/View/Tools/Tool_List_Screen.dart';
 import 'package:indian_farmer/View/Seeds/Seed_Detail_Screen.dart';
 import 'package:indian_farmer/View/Seeds/Seed_List_Screen.dart';
 import 'package:indian_farmer/View/All_Items_Screen.dart';
+import 'package:indian_farmer/View/Fertilizer/Fertilizer_Detail_Screen.dart';
+import 'package:indian_farmer/View/Pesticide/Pesticide_Detail_Screen.dart';
 import 'package:indian_farmer/Model/Seed_Model.dart';
 import 'package:indian_farmer/Model/Tool_Model.dart';
 import 'package:indian_farmer/Model/Irrigation_Model.dart';
@@ -135,6 +137,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   'name': isHindi ? f.nameHindi : f.name,
                   'image': f.image,
                 }).toList(),
+                onCardTap: (i) => Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => FertilizerDetailScreen(fertilizer: allFertilizers[i]),
+                )),
               ),
               _buildDivider(),
               _buildSimpleSection(
@@ -147,6 +152,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   'name': isHindi ? p.nameHindi : p.name,
                   'image': p.image,
                 }).toList(),
+                onCardTap: (i) => Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => PesticideDetailScreen(pesticide: allPesticides[i]),
+                )),
               ),
               _buildDivider(),
               _buildToolSection(context, w, isHindi),
@@ -606,16 +614,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildDivider() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        children: [
-          Expanded(child: Container(height: 1, color: Colors.grey.shade200)),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Text('🌿', style: TextStyle(fontSize: 14, color: Colors.grey.shade400)),
-          ),
-          Expanded(child: Container(height: 1, color: Colors.grey.shade200)),
-        ],
-      ),
+      child: Container(height: 1, color: Colors.grey.shade200),
     );
   }
 
@@ -727,6 +726,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required String navKey,
     required List<Color> colorPair,
     required List<Map<String, String>> items,
+    required void Function(int index) onCardTap,
   }) {
     final show = items.length > 6 ? items.sublist(0, 6) : items;
     return Column(
@@ -743,7 +743,7 @@ class _HomeScreenState extends State<HomeScreen> {
             itemCount: show.length,
             itemBuilder: (ctx, i) {
               final item = show[i];
-              return _itemCard(w, item['name'] ?? '', item['image'] ?? '', colorPair, () => _nav(context, navKey));
+              return _itemCard(w, item['name'] ?? '', item['image'] ?? '', colorPair, () => onCardTap(i));
             },
           ),
         ),
@@ -783,6 +783,9 @@ class _HomeScreenState extends State<HomeScreen> {
           title: isHindi ? 'सभी खाद' : (s?.homeFertilizers ?? 'Fertilizers'),
           items: allFertilizers.map((f) => {'name': isHindi ? f.nameHindi : f.name, 'image': f.image}).toList(),
           fallbackIcon: Icons.eco,
+          onItemTap: (i) => Navigator.push(ctx, MaterialPageRoute(
+            builder: (_) => FertilizerDetailScreen(fertilizer: allFertilizers[i]),
+          )),
         );
         break;
       case 'Pesticides':
@@ -790,6 +793,9 @@ class _HomeScreenState extends State<HomeScreen> {
           title: isHindi ? 'सभी दवा' : (s?.homePesticides ?? 'Pesticides'),
           items: allPesticides.map((p) => {'name': isHindi ? p.nameHindi : p.name, 'image': p.image}).toList(),
           fallbackIcon: Icons.bug_report,
+          onItemTap: (i) => Navigator.push(ctx, MaterialPageRoute(
+            builder: (_) => PesticideDetailScreen(pesticide: allPesticides[i]),
+          )),
         );
         break;
     }

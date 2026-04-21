@@ -81,13 +81,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
         height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
             colors: [
               Color(0xFF1B5E20),
-              Color(0xFF2E7D32),
-              Color(0xFF388E3C),
-              Color(0xFF43A047),
+              Color(0xFF1565C0),
+              Color(0xFF6A1B9A),
+              Color(0xFF00695C),
+              Color(0xFFE65100),
             ],
           ),
         ),
@@ -103,7 +104,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
                   width: w * 0.3,
                   height: w * 0.3,
                   decoration: BoxDecoration(
-                    color: Colors.white,
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
@@ -113,10 +113,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
                       ),
                     ],
                   ),
-                  child: Icon(
-                    Icons.agriculture,
-                    size: w * 0.15,
-                    color: const Color(0xFF2E7D32),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(30),
+                    child: Image.asset(
+                      'assets/app logo.png',
+                      width: w * 0.3,
+                      height: w * 0.3,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),

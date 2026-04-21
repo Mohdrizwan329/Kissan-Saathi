@@ -110,34 +110,16 @@ class _IrrigationDetailScreenState extends State<IrrigationDetailScreen> {
                       ),
                     ),
                   ),
-                  Positioned(right: -30, top: -30,
-                    child: Container(width: 160, height: 160,
-                        decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.07), shape: BoxShape.circle))),
-                  Positioned(left: -20, bottom: 30,
-                    child: Container(width: 110, height: 110,
-                        decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), shape: BoxShape.circle))),
-                  Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: w * 0.26, height: w * 0.26,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.18),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white30, width: 2),
-                          ),
-                          child: Center(
-                            child: Text(widget.method.image, style: const TextStyle(fontSize: 52)),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        if (isHindi)
-                          Text(widget.method.name,
-                              style: GoogleFonts.poppins(fontSize: w * 0.033, color: Colors.white70)),
-                      ],
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Colors.transparent, _blue1.withValues(alpha: 0.75)],
+                      ),
                     ),
                   ),
+                  Center(child: Text(widget.method.image, style: TextStyle(fontSize: w * 0.28))),
                 ],
               ),
             ),

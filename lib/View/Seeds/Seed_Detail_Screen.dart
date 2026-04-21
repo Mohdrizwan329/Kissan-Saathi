@@ -106,51 +106,38 @@ class _SeedDetailScreenState extends State<SeedDetailScreen> {
               background: Stack(
                 fit: StackFit.expand,
                 children: [
+                  if (widget.seed.image.startsWith('http'))
+                    CachedNetworkImage(
+                      imageUrl: widget.seed.image,
+                      fit: BoxFit.cover,
+                      placeholder: (_, __) => Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(colors: [_green1, _green2], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                        ),
+                      ),
+                      errorWidget: (_, __, ___) => Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(colors: [_green1, _green2], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                        ),
+                      ),
+                    )
+                  else
+                    Container(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(colors: [_green1, _green2], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                      ),
+                    ),
                   Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [_green1, _green2],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Colors.transparent, _green1.withValues(alpha: 0.75)],
                       ),
                     ),
                   ),
-                  Positioned(right: -30, top: -30,
-                    child: Container(width: 160, height: 160,
-                        decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.07), shape: BoxShape.circle))),
-                  Positioned(left: -20, bottom: 30,
-                    child: Container(width: 110, height: 110,
-                        decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), shape: BoxShape.circle))),
-                  Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: w * 0.26, height: w * 0.26,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.18),
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white30, width: 2),
-                          ),
-                          child: widget.seed.image.startsWith('http')
-                              ? Padding(
-                                  padding: EdgeInsets.all(w * 0.04),
-                                  child: CachedNetworkImage(
-                                    imageUrl: widget.seed.image,
-                                    placeholder: (_, __) => const CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                                    errorWidget: (_, __, ___) => const Icon(Icons.grass_rounded, color: Colors.white, size: 48),
-                                    fit: BoxFit.contain,
-                                  ),
-                                )
-                              : Center(child: Text(widget.seed.image, style: TextStyle(fontSize: w * 0.12))),
-                        ),
-                        const SizedBox(height: 8),
-                        if (isHindi)
-                          Text(widget.seed.name,
-                              style: GoogleFonts.poppins(fontSize: w * 0.033, color: Colors.white70)),
-                      ],
-                    ),
-                  ),
+                  if (!widget.seed.image.startsWith('http'))
+                    Center(child: Text(widget.seed.image, style: TextStyle(fontSize: w * 0.28))),
                 ],
               ),
             ),

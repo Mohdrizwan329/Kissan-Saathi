@@ -8,12 +8,14 @@ class AllItemsScreen extends StatefulWidget {
   final String title;
   final List<Map<String, String>> items;
   final IconData fallbackIcon;
+  final void Function(int index)? onItemTap;
 
   const AllItemsScreen({
     super.key,
     required this.title,
     required this.items,
     this.fallbackIcon = Icons.image,
+    this.onItemTap,
   });
 
   @override
@@ -32,7 +34,7 @@ class _AllItemsScreenState extends State<AllItemsScreen> {
   @override
   void initState() {
     super.initState();
-    _filtered = List.from(widget.items);
+    _filtered = List.generate(widget.items.length, (i) => {...widget.items[i], '_idx': i.toString()});
     _speech = stt.SpeechToText();
   }
 
@@ -68,8 +70,11 @@ class _AllItemsScreenState extends State<AllItemsScreen> {
     final q = query.trim().toLowerCase();
     setState(() {
       _filtered = q.isEmpty
-          ? List.from(widget.items)
-          : widget.items.where((item) => (item['name'] ?? '').toLowerCase().contains(q)).toList();
+          ? List.generate(widget.items.length, (i) => {...widget.items[i], '_idx': i.toString()})
+          : widget.items.asMap().entries
+              .where((e) => (e.value['name'] ?? '').toLowerCase().contains(q))
+              .map((e) => {...e.value, '_idx': e.key.toString()})
+              .toList();
     });
   }
 
@@ -154,7 +159,11 @@ class _AllItemsScreenState extends State<AllItemsScreen> {
                       childAspectRatio: 0.88,
                     ),
                     itemCount: _filtered.length,
-                    itemBuilder: (ctx, i) => _itemCard(w, _filtered[i]),
+                    itemBuilder: (ctx, i) {
+                      final item = _filtered[i];
+                      final originalIndex = int.tryParse(item['_idx'] ?? '') ?? i;
+                      return _itemCard(w, item, originalIndex);
+                    },
                   ),
           ),
         ],
@@ -162,8 +171,8 @@ class _AllItemsScreenState extends State<AllItemsScreen> {
     );
   }
 
-  Widget _itemCard(double w, Map<String, String> item) {
-    return Container(
+  Widget _itemCard(double w, Map<String, String> item, int originalIndex) {
+    final card = Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -200,5 +209,12 @@ class _AllItemsScreenState extends State<AllItemsScreen> {
         ],
       ),
     );
+    if (widget.onItemTap != null) {
+      return GestureDetector(
+        onTap: () => widget.onItemTap!(originalIndex),
+        child: card,
+      );
+    }
+    return card;
   }
 }

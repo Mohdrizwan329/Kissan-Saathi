@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:indian_farmer/Model/Tool_Model.dart';
+import 'package:indian_farmer/Data/Pesticide_Data.dart';
 import 'package:indian_farmer/l10n/s.dart';
 
-class ToolDetailScreen extends StatefulWidget {
-  final ToolInfo tool;
-  const ToolDetailScreen({super.key, required this.tool});
+class PesticideDetailScreen extends StatefulWidget {
+  final PesticideItem pesticide;
+  const PesticideDetailScreen({super.key, required this.pesticide});
 
   @override
-  State<ToolDetailScreen> createState() => _ToolDetailScreenState();
+  State<PesticideDetailScreen> createState() => _PesticideDetailScreenState();
 }
 
-class _ToolDetailScreenState extends State<ToolDetailScreen> {
-  static const _orange1 = Color(0xFFE65100);
-  static const _orange2 = Color(0xFFFFA726);
+class _PesticideDetailScreenState extends State<PesticideDetailScreen> {
+  static const _purple1 = Color(0xFF6A1B9A);
+  static const _purple2 = Color(0xFFAB47BC);
   static const _cream = Color(0xFFF6F4EE);
 
   late final FlutterTts _tts;
@@ -58,7 +58,8 @@ class _ToolDetailScreenState extends State<ToolDetailScreen> {
     super.dispose();
   }
 
-  Future<void> _toggleAudio(String cardTitle, String content, bool isHindi) async {
+  Future<void> _toggleAudio(BuildContext context, String cardTitle, String content, bool isHindi) async {
+    final messenger = ScaffoldMessenger.of(context);
     if (_playingCardTitle == cardTitle) {
       await _tts.stop().catchError((_) {});
       if (mounted) setState(() { _playingCardTitle = null; _highlightStart = -1; _highlightEnd = -1; });
@@ -72,8 +73,11 @@ class _ToolDetailScreenState extends State<ToolDetailScreen> {
       await _tts.setVolume(1.0);
       if (mounted) setState(() { _playingCardTitle = cardTitle; _highlightStart = -1; _highlightEnd = -1; });
       await _tts.speak(content);
-    } catch (_) {
-      if (mounted) setState(() { _playingCardTitle = null; _highlightStart = -1; _highlightEnd = -1; });
+    } catch (e) {
+      if (mounted) {
+        setState(() { _playingCardTitle = null; _highlightStart = -1; _highlightEnd = -1; });
+        messenger.showSnackBar(SnackBar(content: Text('Audio unavailable: $e'), backgroundColor: Colors.red));
+      }
     }
   }
 
@@ -81,7 +85,7 @@ class _ToolDetailScreenState extends State<ToolDetailScreen> {
   Widget build(BuildContext context) {
     final w = MediaQuery.of(context).size.width;
     final isHindi = Localizations.localeOf(context).languageCode == 'hi';
-    final s = S.of(context);
+    final p = widget.pesticide;
 
     return Scaffold(
       backgroundColor: _cream,
@@ -90,12 +94,12 @@ class _ToolDetailScreenState extends State<ToolDetailScreen> {
           SliverAppBar(
             expandedHeight: 240,
             pinned: true,
-            backgroundColor: _orange1,
+            backgroundColor: _purple1,
             iconTheme: const IconThemeData(color: Colors.white),
             flexibleSpace: FlexibleSpaceBar(
               centerTitle: true,
               title: Text(
-                isHindi ? widget.tool.nameHindi : widget.tool.name,
+                isHindi ? p.nameHindi : p.name,
                 style: GoogleFonts.poppins(fontSize: w * 0.042, fontWeight: FontWeight.w700, color: Colors.white),
               ),
               background: Stack(
@@ -104,22 +108,39 @@ class _ToolDetailScreenState extends State<ToolDetailScreen> {
                   Container(
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [_orange1, _orange2],
+                        colors: [_purple1, _purple2],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                     ),
                   ),
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Colors.transparent, _orange1.withValues(alpha: 0.75)],
-                      ),
+                  Positioned(
+                    right: -30, top: -30,
+                    child: Container(
+                      width: 150, height: 150,
+                      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.06), shape: BoxShape.circle),
                     ),
                   ),
-                  Center(child: Text(widget.tool.image, style: TextStyle(fontSize: w * 0.28))),
+                  Positioned(
+                    left: -20, bottom: 20,
+                    child: Container(
+                      width: 100, height: 100,
+                      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), shape: BoxShape.circle),
+                    ),
+                  ),
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(p.image, style: TextStyle(fontSize: w * 0.28)),
+                        const SizedBox(height: 8),
+                        Text(
+                          '${p.name} · ${p.nameHindi}',
+                          style: GoogleFonts.poppins(fontSize: w * 0.03, color: Colors.white70),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -130,37 +151,35 @@ class _ToolDetailScreenState extends State<ToolDetailScreen> {
               padding: EdgeInsets.all(w * 0.04),
               child: Column(
                 children: [
-                  Row(
-                    children: [
-                      _chip(Icons.currency_rupee_rounded,
-                          isHindi ? widget.tool.priceRangeHindi : widget.tool.priceRange,
-                          _orange1, w),
-                      SizedBox(width: w * 0.02),
-                      _chip(Icons.agriculture_rounded,
-                          (isHindi ? widget.tool.bestForHindi : widget.tool.bestFor).split(',').first,
-                          const Color(0xFF2E7D32), w),
-                    ],
-                  ),
-                  SizedBox(height: w * 0.04),
-
-                  _infoCard(Icons.info_outline_rounded, s?.detailAbout ?? 'About',
-                      isHindi ? widget.tool.descriptionHindi : widget.tool.description,
+                  _infoCard(context, Icons.info_outline_rounded,
+                      S.of(context)?.detailAbout ?? 'About',
+                      isHindi ? p.descriptionHindi : p.description,
                       const Color(0xFF1565C0), w, isHindi),
-                  _infoCard(Icons.handyman_rounded, s?.detailHowToUse ?? 'How to Use',
-                      isHindi ? widget.tool.usageHindi : widget.tool.usage,
-                      const Color(0xFF2E7D32), w, isHindi, initiallyExpanded: true),
-                  _infoCard(Icons.agriculture_rounded, s?.detailBestFor ?? 'Best For',
-                      isHindi ? widget.tool.bestForHindi : widget.tool.bestFor,
-                      const Color(0xFFE65100), w, isHindi),
-                  _infoCard(Icons.build_circle_rounded, s?.detailMaintenance ?? 'Maintenance',
-                      isHindi ? widget.tool.maintenanceHindi : widget.tool.maintenance,
-                      const Color(0xFF00695C), w, isHindi),
-                  _infoCard(Icons.warning_amber_rounded, s?.detailSafetyTips ?? 'Safety Tips',
-                      isHindi ? widget.tool.safetyTipsHindi : widget.tool.safetyTips,
-                      const Color(0xFFE53935), w, isHindi),
-                  _infoCard(Icons.currency_rupee_rounded, s?.detailPriceRange ?? 'Price Range',
-                      isHindi ? widget.tool.priceRangeHindi : widget.tool.priceRange,
+
+                  _infoCard(context, Icons.bug_report_rounded,
+                      isHindi ? 'लक्षित कीट/रोग' : 'Target Pests & Diseases',
+                      isHindi ? p.targetPestsHindi : p.targetPests,
                       const Color(0xFF6A1B9A), w, isHindi),
+
+                  _infoCard(context, Icons.handyman_rounded,
+                      isHindi ? 'कैसे इस्तेमाल करें' : 'How to Use',
+                      isHindi ? p.howToUseHindi : p.howToUse,
+                      const Color(0xFF2E7D32), w, isHindi),
+
+                  _infoCard(context, Icons.scale_rounded,
+                      isHindi ? 'मात्रा / खुराक' : 'Dosage',
+                      isHindi ? p.dosageHindi : p.dosage,
+                      const Color(0xFF0288D1), w, isHindi),
+
+                  _infoCard(context, Icons.timer_rounded,
+                      isHindi ? 'सुरक्षा अंतराल (PHI)' : 'Safety Interval (PHI)',
+                      isHindi ? p.safetyIntervalHindi : p.safetyInterval,
+                      const Color(0xFFFF8F00), w, isHindi),
+
+                  _infoCard(context, Icons.warning_amber_rounded,
+                      isHindi ? 'सावधानियां' : 'Precautions',
+                      isHindi ? p.precautionsHindi : p.precautions,
+                      const Color(0xFFE53935), w, isHindi),
 
                   SizedBox(height: w * 0.06),
                 ],
@@ -172,32 +191,8 @@ class _ToolDetailScreenState extends State<ToolDetailScreen> {
     );
   }
 
-  Widget _chip(IconData icon, String label, Color color, double w) {
-    return Expanded(
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: w * 0.03, vertical: w * 0.025),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withValues(alpha: 0.25)),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: color, size: w * 0.045),
-            SizedBox(width: w * 0.015),
-            Expanded(
-              child: Text(label,
-                  style: GoogleFonts.poppins(fontSize: w * 0.028, fontWeight: FontWeight.w600, color: color),
-                  maxLines: 2, overflow: TextOverflow.ellipsis),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _infoCard(IconData icon, String title, String content, Color color, double w, bool isHindi,
-      {bool initiallyExpanded = false}) {
+  Widget _infoCard(BuildContext context, IconData icon, String title, String content,
+      Color color, double w, bool isHindi) {
     final isPlaying = _playingCardTitle == title;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -209,7 +204,6 @@ class _ToolDetailScreenState extends State<ToolDetailScreen> {
       child: Theme(
         data: ThemeData(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          initiallyExpanded: initiallyExpanded,
           leading: Container(
             width: w * 0.11, height: w * 0.11,
             decoration: BoxDecoration(
@@ -236,7 +230,7 @@ class _ToolDetailScreenState extends State<ToolDetailScreen> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       GestureDetector(
-                        onTap: () => _toggleAudio(title, content, isHindi),
+                        onTap: () => _toggleAudio(context, title, content, isHindi),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
                           padding: EdgeInsets.symmetric(horizontal: w * 0.03, vertical: w * 0.014),
