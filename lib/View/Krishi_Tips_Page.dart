@@ -22,10 +22,6 @@ class _KrishiTipsPageState extends State<KrishiTipsPage> {
   int _selectedCat = 0;
 
   static const _cats = ['सभी', 'रबी', 'खरीफ', 'जैविक', 'सिंचाई', 'मिट्टी'];
-  static const _catColors = [
-    Color(0xFF2E7D32), Color(0xFF1565C0), Color(0xFFE65100),
-    Color(0xFF00695C), Color(0xFF0288D1), Color(0xFF5D4037),
-  ];
 
   static const _localTips = [
     {
@@ -134,7 +130,7 @@ class _KrishiTipsPageState extends State<KrishiTipsPage> {
         : _tips.where((t) => t['cat'] == _selectedCat).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F4EE),
+      backgroundColor: const Color(0xFFE8F5E9),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         flexibleSpace: AppBarStyle.flexibleSpace(),
@@ -155,7 +151,7 @@ class _KrishiTipsPageState extends State<KrishiTipsPage> {
           : Column(
               children: [
                 SizedBox(
-                  height: 52,
+                  height: 56,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -167,19 +163,35 @@ class _KrishiTipsPageState extends State<KrishiTipsPage> {
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
                           margin: const EdgeInsets.only(right: 8),
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                           decoration: BoxDecoration(
-                            color: selected ? _catColors[i] : Colors.white,
+                            gradient: selected
+                                ? const LinearGradient(
+                                    colors: [Color(0xFF1B5E20), Color(0xFF2E7D32)],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  )
+                                : const LinearGradient(
+                                    colors: [Color(0xFF2E7D32), Color(0xFF66BB6A)],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: selected ? _catColors[i] : Colors.grey.shade300),
-                            boxShadow: selected
-                                ? [BoxShadow(color: _catColors[i].withValues(alpha: 0.3), blurRadius: 6, offset: const Offset(0, 2))]
-                                : [],
+                            boxShadow: const [BoxShadow(color: Color(0x4C2E7D32), blurRadius: 4, offset: Offset(0, 2))],
+                            border: selected
+                                ? Border.all(color: Colors.white, width: 2)
+                                : null,
                           ),
-                          child: Text(_cats[i],
+                          child: Center(
+                            child: Text(
+                              _cats[i],
                               style: GoogleFonts.poppins(
-                                  fontSize: 12, fontWeight: FontWeight.w600,
-                                  color: selected ? Colors.white : Colors.grey.shade600)),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
                         ),
                       );
                     },
@@ -208,9 +220,13 @@ class _KrishiTipsPageState extends State<KrishiTipsPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft, end: Alignment.bottomRight,
+          colors: [color.withValues(alpha: 0.10), color.withValues(alpha: 0.03)],
+        ),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 3))],
+        border: Border.all(color: color.withValues(alpha: 0.22)),
+        boxShadow: [BoxShadow(color: color.withValues(alpha: 0.12), blurRadius: 8, offset: const Offset(0, 3))],
       ),
       child: Padding(
         padding: const EdgeInsets.all(14),

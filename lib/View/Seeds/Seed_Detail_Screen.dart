@@ -17,7 +17,7 @@ class SeedDetailScreen extends StatefulWidget {
 class _SeedDetailScreenState extends State<SeedDetailScreen> {
   static const _green1 = Color(0xFF2E7D32);
   static const _green2 = Color(0xFF66BB6A);
-  static const _cream = Color(0xFFF6F4EE);
+  static const _cream = Color(0xFFE8F5E9);
 
   late final FlutterTts _tts;
   String? _playingCardTitle;
@@ -235,9 +235,14 @@ class _SeedDetailScreenState extends State<SeedDetailScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [color.withValues(alpha: 0.12), color.withValues(alpha: 0.04)],
+        ),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 8, offset: const Offset(0, 3))],
+        border: Border.all(color: color.withValues(alpha: 0.20), width: 1),
+        boxShadow: [BoxShadow(color: color.withValues(alpha: 0.12), blurRadius: 8, offset: const Offset(0, 3))],
       ),
       child: Theme(
         data: ThemeData(dividerColor: Colors.transparent),

@@ -47,7 +47,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
     final productImageHeight =
         isPortrait ? screenHeight * 0.3 : screenHeight * 0.5;
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: const Color(0xFFE8F5E9),
 
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -99,13 +99,13 @@ class _DetailsScreenState extends State<DetailsScreen> {
                       children: [
                         _buildIconButton(
                           icon: Icons.share,
-                          onTap: () => print('Share tapped'),
+                          onTap: () {},
                           size: screenWidth * 0.06,
                         ),
                         SizedBox(width: screenWidth * 0.02),
                         _buildIconButton(
                           icon: Icons.favorite_border,
-                          onTap: () => print('Favorite tapped'),
+                          onTap: () {},
                           size: screenWidth * 0.06,
                         ),
                       ],

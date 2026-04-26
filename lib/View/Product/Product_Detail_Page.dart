@@ -9,30 +9,61 @@ class ProductDetailPage extends StatelessWidget {
 
   static const _green1 = Color(0xFF1B5E20);
   static const _green2 = Color(0xFF388E3C);
-  static const _cream = Color(0xFFF6F4EE);
+  static const _cream = Color(0xFFE8F5E9);
 
-  static const _sections = [
-    {'icon': Icons.info_outline_rounded, 'title': 'फसल के बारे में', 'color': 0xFF1565C0,
-      'content': 'चावल (धान) भारत में उगाई जाने वाली सबसे महत्वपूर्ण मुख्य खाद्य फसलों में से एक है। यह उष्णकटिबंधीय जलवायु में पनपती है और मुख्यतः खरीफ मौसम में उगाई जाती है।'},
-    {'icon': Icons.landscape_rounded, 'title': 'खेत की तैयारी', 'color': 0xFF5D4037,
-      'content': 'खेत को मिट्टी को बारीक और समतल बनाने के लिए 2-3 बार जोतें। मिट्टी को समृद्ध करने के लिए कम्पोस्ट या खेत की खाद डालें।'},
-    {'icon': Icons.agriculture_rounded, 'title': 'बुवाई का समय', 'color': 0xFF2E7D32,
-      'content': 'बुवाई जून के अंतिम सप्ताह से जुलाई के पहले सप्ताह तक होती है। उपचारित और प्रमाणित बीजों का उपयोग करें।'},
-    {'icon': Icons.content_cut_rounded, 'title': 'कटाई का समय', 'color': 0xFFF9A825,
-      'content': 'कटाई सामान्यतः अक्टूबर या नवंबर में होती है जब फसल सुनहरी पीली हो जाती है और दाने पक जाते हैं।'},
-    {'icon': Icons.eco_rounded, 'title': 'अनुशंसित खाद', 'color': 0xFF00695C,
-      'content': '• नाइट्रोजन: 100 किग्रा/हेक्टेयर\n• फास्फोरस: 60 किग्रा/हेक्टेयर\n• पोटाश: 40 किग्रा/हेक्टेयर\n• जैविक खाद: वर्मीकम्पोस्ट, गोबर खाद, हरी खाद'},
+  List<Map<String, Object>> _buildSections(bool isHindi) => [
+    {
+      'icon': Icons.info_outline_rounded,
+      'title': isHindi ? 'फसल के बारे में' : 'About the Crop',
+      'color': 0xFF1565C0,
+      'content': isHindi
+          ? 'चावल (धान) भारत में उगाई जाने वाली सबसे महत्वपूर्ण मुख्य खाद्य फसलों में से एक है। यह उष्णकटिबंधीय जलवायु में पनपती है और मुख्यतः खरीफ मौसम में उगाई जाती है।'
+          : 'Rice (Paddy) is one of the most important staple food crops grown in India. It thrives in tropical climates and is primarily cultivated in the Kharif season.',
+    },
+    {
+      'icon': Icons.landscape_rounded,
+      'title': isHindi ? 'खेत की तैयारी' : 'Field Preparation',
+      'color': 0xFF5D4037,
+      'content': isHindi
+          ? 'खेत को मिट्टी को बारीक और समतल बनाने के लिए 2-3 बार जोतें। मिट्टी को समृद्ध करने के लिए कम्पोस्ट या खेत की खाद डालें।'
+          : 'Plough the field 2–3 times to make the soil fine and level. Add compost or farmyard manure to enrich the soil.',
+    },
+    {
+      'icon': Icons.agriculture_rounded,
+      'title': isHindi ? 'बुवाई का समय' : 'Sowing Time',
+      'color': 0xFF2E7D32,
+      'content': isHindi
+          ? 'बुवाई जून के अंतिम सप्ताह से जुलाई के पहले सप्ताह तक होती है। उपचारित और प्रमाणित बीजों का उपयोग करें।'
+          : 'Sowing takes place from the last week of June to the first week of July. Use treated and certified seeds.',
+    },
+    {
+      'icon': Icons.content_cut_rounded,
+      'title': isHindi ? 'कटाई का समय' : 'Harvesting Time',
+      'color': 0xFFF9A825,
+      'content': isHindi
+          ? 'कटाई सामान्यतः अक्टूबर या नवंबर में होती है जब फसल सुनहरी पीली हो जाती है और दाने पक जाते हैं।'
+          : 'Harvesting is generally done in October or November when the crop turns golden yellow and the grains are ripe.',
+    },
+    {
+      'icon': Icons.eco_rounded,
+      'title': isHindi ? 'अनुशंसित खाद' : 'Recommended Fertilizers',
+      'color': 0xFF00695C,
+      'content': isHindi
+          ? '• नाइट्रोजन: 100 किग्रा/हेक्टेयर\n• फास्फोरस: 60 किग्रा/हेक्टेयर\n• पोटाश: 40 किग्रा/हेक्टेयर\n• जैविक खाद: वर्मीकम्पोस्ट, गोबर खाद, हरी खाद'
+          : '• Nitrogen: 100 kg/hectare\n• Phosphorus: 60 kg/hectare\n• Potash: 40 kg/hectare\n• Organic: Vermicompost, FYM, Green manure',
+    },
   ];
 
   @override
   Widget build(BuildContext context) {
     final w = MediaQuery.of(context).size.width;
+    final isHindi = Localizations.localeOf(context).languageCode == 'hi';
+    final sections = _buildSections(isHindi);
 
     return Scaffold(
       backgroundColor: _cream,
       body: CustomScrollView(
         slivers: [
-          // ── SliverAppBar ─────────────────────────────────────────
           SliverAppBar(
             expandedHeight: 220,
             pinned: true,
@@ -40,8 +71,10 @@ class ProductDetailPage extends StatelessWidget {
             iconTheme: const IconThemeData(color: Colors.white),
             flexibleSpace: FlexibleSpaceBar(
               centerTitle: true,
-              title: Text('फसल विवरण',
-                  style: GoogleFonts.poppins(fontSize: w * 0.042, fontWeight: FontWeight.w700, color: Colors.white)),
+              title: Text(
+                isHindi ? 'फसल विवरण' : 'Crop Details',
+                style: GoogleFonts.poppins(fontSize: w * 0.042, fontWeight: FontWeight.w700, color: Colors.white),
+              ),
               background: Stack(
                 fit: StackFit.expand,
                 children: [
@@ -84,26 +117,23 @@ class ProductDetailPage extends StatelessWidget {
             ),
           ),
 
-          // ── Content ──────────────────────────────────────────────
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Quick chips
                   Row(
                     children: [
-                      _chip(Icons.wb_sunny_rounded, 'खरीफ', const Color(0xFFFF8F00)),
+                      _chip(Icons.wb_sunny_rounded, isHindi ? 'खरीफ' : 'Kharif', const Color(0xFFFF8F00)),
                       const SizedBox(width: 10),
-                      _chip(Icons.water_drop_rounded, 'सिंचित', const Color(0xFF0288D1)),
+                      _chip(Icons.water_drop_rounded, isHindi ? 'सिंचित' : 'Irrigated', const Color(0xFF0288D1)),
                       const SizedBox(width: 10),
-                      _chip(Icons.bar_chart_rounded, 'अधिक उत्पादन', const Color(0xFF2E7D32)),
+                      _chip(Icons.bar_chart_rounded, isHindi ? 'अधिक उत्पादन' : 'High Yield', const Color(0xFF2E7D32)),
                     ],
                   ),
                   const SizedBox(height: 16),
 
-                  // Video card
                   GestureDetector(
                     onTap: () => launchUrl(Uri.parse(_videoUrl), mode: LaunchMode.externalApplication),
                     child: Container(
@@ -140,8 +170,10 @@ class ProductDetailPage extends StatelessWidget {
                                 color: Colors.black.withValues(alpha: 0.6),
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Text('▶ धान की खेती की जानकारी',
-                                  style: GoogleFonts.poppins(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w600)),
+                              child: Text(
+                                isHindi ? '▶ धान की खेती की जानकारी' : '▶ Rice Farming Guide',
+                                style: GoogleFonts.poppins(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w600),
+                              ),
                             ),
                           ),
                         ],
@@ -150,8 +182,7 @@ class ProductDetailPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 20),
 
-                  // Info sections
-                  ..._sections.map((s) => _infoCard(s, w)),
+                  ...sections.map((s) => _infoCard(s, w)),
                   const SizedBox(height: 12),
                 ],
               ),

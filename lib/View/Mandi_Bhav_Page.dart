@@ -48,6 +48,9 @@ class _MandiBhavPageState extends State<MandiBhavPage> {
     Color(0xFF283593), Color(0xFF558B2F), Color(0xFFAD1457),
   ];
 
+  Color _getColor(String commodity) =>
+      _colorList[commodity.length % _colorList.length];
+
   int _selectedState = 0;
   List<Map<String, dynamic>> _prices = [];
   bool _loading = false;
@@ -66,9 +69,6 @@ class _MandiBhavPageState extends State<MandiBhavPage> {
     }
     return '🌱';
   }
-
-  Color _getColor(String commodity) =>
-      _colorList[commodity.length % _colorList.length];
 
   Future<void> _fetchPrices() async {
     if (!mounted) return;
@@ -89,7 +89,10 @@ class _MandiBhavPageState extends State<MandiBhavPage> {
         if (mounted) setState(() { _error = 'Server error: ${response.statusCode}'; _loading = false; });
       }
     } catch (_) {
-      if (mounted) setState(() { _error = 'इंटरनेट कनेक्शन जांचें'; _loading = false; });
+      if (mounted) {
+        final isH = Localizations.localeOf(context).languageCode == 'hi';
+        setState(() { _error = isH ? 'इंटरनेट कनेक्शन जांचें' : 'Check internet connection'; _loading = false; });
+      }
     }
   }
 
@@ -98,7 +101,7 @@ class _MandiBhavPageState extends State<MandiBhavPage> {
     final isHindi = Localizations.localeOf(context).languageCode == 'hi';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F4EE),
+      backgroundColor: const Color(0xFFE8F5E9),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         flexibleSpace: AppBarStyle.flexibleSpace(),
@@ -117,7 +120,7 @@ class _MandiBhavPageState extends State<MandiBhavPage> {
       body: Column(
         children: [
           Container(
-            color: Colors.white,
+            color: const Color(0xFFE8F5E9),
             padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,7 +151,7 @@ class _MandiBhavPageState extends State<MandiBhavPage> {
                 ),
                 const SizedBox(height: 8),
                 SizedBox(
-                  height: 36,
+                  height: 40,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: _states.length,
@@ -162,17 +165,29 @@ class _MandiBhavPageState extends State<MandiBhavPage> {
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
                           margin: const EdgeInsets.only(right: 8),
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                           decoration: BoxDecoration(
-                            color: sel ? const Color(0xFF2E7D32) : const Color(0xFFF6F4EE),
+                            gradient: sel
+                                ? const LinearGradient(
+                                    colors: [Color(0xFF1B5E20), Color(0xFF2E7D32)],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  )
+                                : const LinearGradient(
+                                    colors: [Color(0xFF2E7D32), Color(0xFF66BB6A)],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: sel ? const Color(0xFF2E7D32) : Colors.grey.shade300),
+                            border: sel ? Border.all(color: Colors.white, width: 2) : null,
+                            boxShadow: const [BoxShadow(color: Color(0x4C2E7D32), blurRadius: 4, offset: Offset(0, 2))],
                           ),
-                          child: Text(
-                            isHindi ? _states[i]['hindi']! : _states[i]['name']!,
-                            style: GoogleFonts.poppins(
-                                fontSize: 12, fontWeight: FontWeight.w600,
-                                color: sel ? Colors.white : Colors.grey.shade600),
+                          child: Center(
+                            child: Text(
+                              isHindi ? _states[i]['hindi']! : _states[i]['name']!,
+                              style: GoogleFonts.poppins(
+                                  fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white),
+                            ),
                           ),
                         ),
                       );
@@ -270,9 +285,13 @@ class _MandiBhavPageState extends State<MandiBhavPage> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft, end: Alignment.bottomRight,
+          colors: [color.withValues(alpha: 0.10), color.withValues(alpha: 0.03)],
+        ),
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 6, offset: const Offset(0, 2))],
+        border: Border.all(color: color.withValues(alpha: 0.22)),
+        boxShadow: [BoxShadow(color: color.withValues(alpha: 0.10), blurRadius: 6, offset: const Offset(0, 2))],
       ),
       child: Row(
         children: [

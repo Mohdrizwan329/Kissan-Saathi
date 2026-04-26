@@ -8,7 +8,7 @@ import 'package:indian_farmer/l10n/s.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  GoogleFonts.config.allowRuntimeFetching = true;
+  GoogleFonts.config.allowRuntimeFetching = false;
 
   runApp(const ProviderScope(child: MyApp()));
 }

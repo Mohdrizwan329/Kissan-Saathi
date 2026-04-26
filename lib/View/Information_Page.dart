@@ -12,12 +12,8 @@ class InformationPage extends StatelessWidget {
   Future<void> _launchVideo(String url) async {
     final Uri uri = Uri.parse(url);
     try {
-      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-        print('Could not launch $url');
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {}
   }
 
   @override
@@ -57,7 +53,7 @@ class InformationPage extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: const Color(0xFFE8F5E9),
 
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -66,6 +62,7 @@ class InformationPage extends StatelessWidget {
           localized.informationPageTitle,
           style: ConstTextStyle.appbarTitle,
         ),
+        centerTitle: true,
         elevation: 0,
         iconTheme: IconThemeData(color: Colors.white),
       ),
@@ -82,11 +79,15 @@ class InformationPage extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.all(containerPadding),
               decoration: BoxDecoration(
-                color: Colors.white,
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF2E7D32), Color(0xFF66BB6A)],
+                ),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: const [
                   BoxShadow(
-                    color: Colors.black12,
+                    color: Color(0x4C2E7D32),
                     blurRadius: 8,
                     offset: Offset(0, 2),
                   ),
@@ -100,27 +101,28 @@ class InformationPage extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: titleFontSize,
                       fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
                   SizedBox(height: 10),
                   Text(
                     "• ${item['description1']}",
-                    style: GoogleFonts.poppins(fontSize: descFontSize),
+                    style: GoogleFonts.poppins(fontSize: descFontSize, color: Colors.white.withValues(alpha: 0.9)),
                   ),
                   SizedBox(height: 6),
                   Text(
                     "• ${item['description2']}",
-                    style: GoogleFonts.poppins(fontSize: descFontSize),
+                    style: GoogleFonts.poppins(fontSize: descFontSize, color: Colors.white.withValues(alpha: 0.9)),
                   ),
                   SizedBox(height: 6),
                   Text(
                     "• ${item['description3']}",
-                    style: GoogleFonts.poppins(fontSize: descFontSize),
+                    style: GoogleFonts.poppins(fontSize: descFontSize, color: Colors.white.withValues(alpha: 0.9)),
                   ),
                   SizedBox(height: 16),
                   Row(
                     children: [
-                      Icon(Icons.play_circle, color: Colors.black87),
+                      Icon(Icons.play_circle, color: Colors.white),
                       SizedBox(width: 8),
                       TextButton(
                         onPressed: () {
@@ -128,7 +130,8 @@ class InformationPage extends StatelessWidget {
                             "https://youtu.be/_yPp-Z_cB7g?si=u4WUEemX167Mamtq",
                           );
                         },
-                        child: Text(localized.watchDemoVideo),
+                        child: Text(localized.watchDemoVideo,
+                          style: GoogleFonts.poppins(color: Colors.white70, fontWeight: FontWeight.w600)),
                       ),
                     ],
                   ),

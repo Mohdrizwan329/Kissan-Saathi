@@ -30,7 +30,7 @@ class _NewsPageState extends State<NewsPage> with SingleTickerProviderStateMixin
     final isHindi = Localizations.localeOf(context).languageCode == 'hi';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F4EE),
+      backgroundColor: const Color(0xFFE8F5E9),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         flexibleSpace: AppBarStyle.flexibleSpace(),
@@ -380,7 +380,7 @@ class _MandiBhavTabState extends State<_MandiBhavTab> {
                         margin: const EdgeInsets.only(right: 8),
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                         decoration: BoxDecoration(
-                          color: sel ? const Color(0xFF2E7D32) : const Color(0xFFF6F4EE),
+                          color: sel ? const Color(0xFF2E7D32) : const Color(0xFFE8F5E9),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(color: sel ? const Color(0xFF2E7D32) : Colors.grey.shade300),
                         ),

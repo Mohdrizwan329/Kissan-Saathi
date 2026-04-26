@@ -1,47 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:indian_farmer/Res/Const_Color.dart';
 import 'package:indian_farmer/Res/Const_Text_Style.dart';
 import 'package:indian_farmer/View/Information_Page.dart';
 import 'package:indian_farmer/Res/App_Bar_Style.dart';
 
 class KisaanInfoPage extends StatelessWidget {
-  final List<Map<String, String>> infoList = [
-    {
-      'title': 'Irrigation\nTiming &\nDuration',
-      'icon':
-          'https://img.freepik.com/premium-vector/indian-farmer-holding-green-crops_1308360-47.jpg',
-    },
-    {
-      'title': 'Insecticide\nPesticides',
-      'icon':
-          'https://img.freepik.com/premium-vector/indian-farmer-holding-green-crops_1308360-47.jpg',
-    },
-    {
-      'title': 'Fertilizer Timing &\nDuration',
-      'icon':
-          'https://img.freepik.com/premium-vector/indian-farmer-holding-green-crops_1308360-47.jpg',
-    },
-    {
-      'title': 'Plowing',
-      'icon':
-          'https://img.freepik.com/premium-vector/indian-farmer-holding-green-crops_1308360-47.jpg',
-    },
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final isHindi = Localizations.localeOf(context).languageCode == 'hi';
     final double screenWidth = MediaQuery.of(context).size.width;
     final double imageSize = screenWidth * 0.25; // Responsive image size
     final double horizontalPadding = screenWidth * 0.04;
 
+    final List<Map<String, String>> infoList = [
+      {
+        'title': isHindi ? 'सिंचाई का\nसमय और\nअवधि' : 'Irrigation\nTiming &\nDuration',
+        'icon':
+            'https://img.freepik.com/premium-vector/indian-farmer-holding-green-crops_1308360-47.jpg',
+      },
+      {
+        'title': isHindi ? 'कीटनाशक\nपेस्टीसाइड' : 'Insecticide\nPesticides',
+        'icon':
+            'https://img.freepik.com/premium-vector/indian-farmer-holding-green-crops_1308360-47.jpg',
+      },
+      {
+        'title': isHindi ? 'खाद का समय\nऔर अवधि' : 'Fertilizer Timing &\nDuration',
+        'icon':
+            'https://img.freepik.com/premium-vector/indian-farmer-holding-green-crops_1308360-47.jpg',
+      },
+      {
+        'title': isHindi ? 'जुताई' : 'Plowing',
+        'icon':
+            'https://img.freepik.com/premium-vector/indian-farmer-holding-green-crops_1308360-47.jpg',
+      },
+    ];
+
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: const Color(0xFFE8F5E9),
 
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         flexibleSpace: AppBarStyle.flexibleSpace(),
-        title: Text('Seeds Information', style: ConstTextStyle.appbarTitle),
+        title: Text(isHindi ? 'बीज जानकारी' : 'Seeds Information', style: ConstTextStyle.appbarTitle),
+        centerTitle: true,
         elevation: 0,
         iconTheme: IconThemeData(color: Colors.white),
       ),
@@ -61,14 +62,17 @@ class KisaanInfoPage extends StatelessWidget {
                 ),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF2E7D32), Color(0xFF66BB6A)],
+                ),
                 borderRadius: BorderRadius.circular(12),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
-                    color: Colors.grey.withValues(alpha: 0.1),
-                    spreadRadius: 1,
-                    blurRadius: 3,
-                    offset: Offset(0, 1),
+                    color: Color(0x4C2E7D32),
+                    blurRadius: 6,
+                    offset: Offset(0, 2),
                   ),
                 ],
               ),
@@ -108,7 +112,7 @@ class KisaanInfoPage extends StatelessWidget {
                             item['title']!,
                             maxLines: 3,
                             overflow: TextOverflow.ellipsis,
-                            style: ConstTextStyle.TextBlackinfo,
+                            style: ConstTextStyle.TextBlackinfo.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
                           ),
                           SizedBox(height: 8),
                         ],
@@ -122,7 +126,7 @@ class KisaanInfoPage extends StatelessWidget {
                       child: Icon(
                         Icons.arrow_forward_ios,
                         size: 16,
-                        color: ConstColor.textColorBlack,
+                        color: Colors.white,
                       ),
                     ),
                   ),

@@ -16,7 +16,7 @@ class PesticideDetailScreen extends StatefulWidget {
 class _PesticideDetailScreenState extends State<PesticideDetailScreen> {
   static const _purple1 = Color(0xFF6A1B9A);
   static const _purple2 = Color(0xFFAB47BC);
-  static const _cream = Color(0xFFF6F4EE);
+  static const _cream = Color(0xFFE8F5E9);
 
   late final FlutterTts _tts;
   String? _playingCardTitle;
@@ -133,11 +133,6 @@ class _PesticideDetailScreenState extends State<PesticideDetailScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(p.image, style: TextStyle(fontSize: w * 0.28)),
-                        const SizedBox(height: 8),
-                        Text(
-                          '${p.name} · ${p.nameHindi}',
-                          style: GoogleFonts.poppins(fontSize: w * 0.03, color: Colors.white70),
-                        ),
                       ],
                     ),
                   ),
@@ -197,9 +192,14 @@ class _PesticideDetailScreenState extends State<PesticideDetailScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [color.withValues(alpha: 0.12), color.withValues(alpha: 0.04)],
+        ),
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 8, offset: const Offset(0, 3))],
+        border: Border.all(color: color.withValues(alpha: 0.20), width: 1),
+        boxShadow: [BoxShadow(color: color.withValues(alpha: 0.12), blurRadius: 8, offset: const Offset(0, 3))],
       ),
       child: Theme(
         data: ThemeData(dividerColor: Colors.transparent),

@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:indian_farmer/Provider/locale_provider.dart';
-import 'package:indian_farmer/View/Bottom_NavigationBar.dart';
+import 'package:indian_farmer/View/Onboarding_Screen.dart';
+
+const _bg1 = Color(0xFF0E2A10);
+const _bg2 = Color(0xFF1B5E20);
+const _gold = Color(0xFFF9A825);
 
 class LanguageSelectionScreen extends ConsumerWidget {
   const LanguageSelectionScreen({super.key});
@@ -12,10 +16,9 @@ class LanguageSelectionScreen extends ConsumerWidget {
     Navigator.pushReplacement(
       context,
       PageRouteBuilder(
-        pageBuilder: (_, __, ___) => MyHomePage(),
-        transitionsBuilder: (_, anim, __, child) {
-          return FadeTransition(opacity: anim, child: child);
-        },
+        pageBuilder: (_, __, ___) => const OnboardingScreen(),
+        transitionsBuilder: (_, anim, __, child) =>
+            FadeTransition(opacity: anim, child: child),
         transitionDuration: const Duration(milliseconds: 500),
       ),
     );
@@ -32,111 +35,143 @@ class LanguageSelectionScreen extends ConsumerWidget {
         height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF1B5E20),
-              Color(0xFF2E7D32),
-              Color(0xFF388E3C),
-              Color(0xFF43A047),
-            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [_bg1, _bg2, _bg1],
+            stops: [0.0, 0.5, 1.0],
           ),
         ),
         child: SafeArea(
-          child: Column(
-            children: [
-              SizedBox(height: h * 0.08),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.symmetric(horizontal: w * 0.08),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: h),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: h * 0.06),
 
-              // Icon
-              Container(
-                width: w * 0.2,
-                height: w * 0.2,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.2),
-                      blurRadius: 15,
-                      offset: const Offset(0, 8),
+                  // Icon badge
+                  Container(
+                    width: w * 0.22,
+                    height: w * 0.22,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha: 0.1),
+                      border: Border.all(color: _gold.withValues(alpha: 0.55), width: 2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: _gold.withValues(alpha: 0.2),
+                          blurRadius: 24,
+                          spreadRadius: 4,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                child: Icon(
-                  Icons.translate,
-                  size: w * 0.1,
-                  color: const Color(0xFF2E7D32),
-                ),
-              ),
-
-              SizedBox(height: h * 0.03),
-
-              // Title
-              Text(
-                'भाषा चुनें',
-                style: GoogleFonts.poppins(
-                  fontSize: w * 0.07,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
-              ),
-
-              SizedBox(height: w * 0.01),
-
-              Text(
-                'Select Language',
-                style: GoogleFonts.poppins(
-                  fontSize: w * 0.045,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.white70,
-                ),
-              ),
-
-              SizedBox(height: h * 0.06),
-
-              // Language Cards
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: w * 0.08),
-                child: Column(
-                  children: [
-                    // Hindi Card
-                    _LanguageCard(
-                      title: 'हिन्दी',
-                      subtitle: 'Hindi',
-                      icon: '🇮🇳',
-                      description: 'ऐप को हिन्दी में उपयोग करें',
-                      onTap: () => _selectLanguage(context, ref, 'hi'),
+                    child: Icon(
+                      Icons.translate_rounded,
+                      size: w * 0.1,
+                      color: _gold,
                     ),
-
-                    SizedBox(height: h * 0.025),
-
-                    // English Card
-                    _LanguageCard(
-                      title: 'English',
-                      subtitle: 'अंग्रेज़ी',
-                      icon: '🌐',
-                      description: 'Use the app in English',
-                      onTap: () => _selectLanguage(context, ref, 'en'),
-                    ),
-                  ],
-                ),
-              ),
-
-              const Spacer(),
-
-              // Bottom hint
-              Padding(
-                padding: EdgeInsets.only(bottom: h * 0.04),
-                child: Text(
-                  'आप बाद में भी भाषा बदल सकते हैं\nYou can change the language later',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.poppins(
-                    fontSize: w * 0.032,
-                    color: Colors.white54,
                   ),
-                ),
+
+                  SizedBox(height: h * 0.03),
+
+                  // Gold divider
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: w * 0.08,
+                        height: 2,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Colors.transparent, _gold.withValues(alpha: 0.8)],
+                          ),
+                          borderRadius: BorderRadius.circular(1),
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
+                        width: 6,
+                        height: 6,
+                        decoration: const BoxDecoration(color: _gold, shape: BoxShape.circle),
+                      ),
+                      Container(
+                        width: w * 0.08,
+                        height: 2,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [_gold.withValues(alpha: 0.8), Colors.transparent],
+                          ),
+                          borderRadius: BorderRadius.circular(1),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: h * 0.02),
+
+                  // Title
+                  Text(
+                    'भाषा चुनें',
+                    style: GoogleFonts.poppins(
+                      fontSize: w * 0.072,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      height: 1.25,
+                    ),
+                  ),
+
+                  SizedBox(height: h * 0.008),
+
+                  Text(
+                    'Select Language',
+                    style: GoogleFonts.poppins(
+                      fontSize: w * 0.04,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.white.withValues(alpha: 0.65),
+                    ),
+                  ),
+
+                  SizedBox(height: h * 0.055),
+
+                  // Hindi Card
+                  _LanguageCard(
+                    title: 'हिन्दी',
+                    subtitle: 'Hindi',
+                    icon: '🇮🇳',
+                    description: 'ऐप को हिन्दी में उपयोग करें',
+                    onTap: () => _selectLanguage(context, ref, 'hi'),
+                  ),
+
+                  SizedBox(height: h * 0.025),
+
+                  // English Card
+                  _LanguageCard(
+                    title: 'English',
+                    subtitle: 'अंग्रेज़ी',
+                    icon: '🌐',
+                    description: 'Use the app in English',
+                    onTap: () => _selectLanguage(context, ref, 'en'),
+                  ),
+
+                  SizedBox(height: h * 0.06),
+
+                  // Bottom hint
+                  Text(
+                    'आप बाद में भी भाषा बदल सकते हैं\nYou can change the language later',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      fontSize: w * 0.032,
+                      color: Colors.white.withValues(alpha: 0.4),
+                      height: 1.7,
+                    ),
+                  ),
+
+                  SizedBox(height: h * 0.04),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -172,27 +207,16 @@ class _LanguageCard extends StatelessWidget {
           vertical: w * 0.05,
         ),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Colors.white.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
-              blurRadius: 15,
-              offset: const Offset(0, 6),
-            ),
-          ],
+          border: Border.all(color: Colors.white.withValues(alpha: 0.15), width: 1),
         ),
         child: Row(
           children: [
-            // Icon
-            Text(
-              icon,
-              style: TextStyle(fontSize: w * 0.1),
-            ),
+            Text(icon, style: TextStyle(fontSize: w * 0.1)),
 
             SizedBox(width: w * 0.05),
 
-            // Text
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -202,7 +226,7 @@ class _LanguageCard extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: w * 0.055,
                       fontWeight: FontWeight.w700,
-                      color: const Color(0xFF1B5E20),
+                      color: Colors.white,
                     ),
                   ),
                   Text(
@@ -210,7 +234,7 @@ class _LanguageCard extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: w * 0.035,
                       fontWeight: FontWeight.w400,
-                      color: Colors.grey.shade600,
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ),
                   SizedBox(height: w * 0.01),
@@ -218,18 +242,25 @@ class _LanguageCard extends StatelessWidget {
                     description,
                     style: GoogleFonts.poppins(
                       fontSize: w * 0.03,
-                      color: Colors.grey.shade500,
+                      color: Colors.white.withValues(alpha: 0.5),
                     ),
                   ),
                 ],
               ),
             ),
 
-            // Arrow
-            Icon(
-              Icons.arrow_forward_ios,
-              color: const Color(0xFF2E7D32),
-              size: w * 0.05,
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: _gold.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+                border: Border.all(color: _gold.withValues(alpha: 0.4), width: 1),
+              ),
+              child: Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: _gold,
+                size: w * 0.04,
+              ),
             ),
           ],
         ),

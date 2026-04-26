@@ -9,24 +9,56 @@ class FertilizerDetailPage extends StatelessWidget {
 
   static const _brown1 = Color(0xFF4E342E);
   static const _brown2 = Color(0xFF8D6E63);
-  static const _cream = Color(0xFFF6F4EE);
+  static const _cream = Color(0xFFE8F5E9);
 
-  static const _sections = [
-    {'icon': Icons.info_outline_rounded, 'title': 'खाद के बारे में', 'color': 0xFF1565C0,
-      'content': 'यूरिया एक नाइट्रोजन युक्त खाद है जिसका उपयोग पत्तेदार फसलों में तेज़ वृद्धि के लिए किया जाता है। यह प्रकाश संश्लेषण को बढ़ाती है और मज़बूत तने के विकास में मदद करती है।'},
-    {'icon': Icons.landscape_rounded, 'title': 'खेत की तैयारी', 'color': 0xFF5D4037,
-      'content': 'खाद डालने से पहले खेत को 2-3 बार जोतें। सुनिश्चित करें कि मिट्टी नम और अच्छी तरह से सूखी हो। उर्वरता बढ़ाने के लिए जैविक खाद या कम्पोस्ट मिलाएं।'},
-    {'icon': Icons.handyman_rounded, 'title': 'कैसे इस्तेमाल करें', 'color': 0xFF2E7D32,
-      'content': 'खाद को पानी में घोलकर (अगर पानी में घुलनशील हो) या पौधे की जड़ के चारों ओर समान रूप से डालें। पत्तियों के सीधे संपर्क से बचें।'},
-    {'icon': Icons.access_time_rounded, 'title': 'कब डालें', 'color': 0xFFFF8F00,
-      'content': 'प्रारंभिक विकास चरणों में, विशेष रूप से फूल आने से पहले और सिंचाई के बाद अधिकतम पोषक तत्व अवशोषण के लिए डालें।'},
-    {'icon': Icons.warning_amber_rounded, 'title': 'कब न डालें', 'color': 0xFFE53935,
-      'content': 'अत्यधिक गर्मी या भारी बारिश के दौरान खाद का उपयोग न करें। सूखी मिट्टी पर या कटाई के समय न डालें।'},
+  List<Map<String, Object>> _buildSections(bool isHindi) => [
+    {
+      'icon': Icons.info_outline_rounded,
+      'title': isHindi ? 'खाद के बारे में' : 'About Fertilizer',
+      'color': 0xFF1565C0,
+      'content': isHindi
+          ? 'यूरिया एक नाइट्रोजन युक्त खाद है जिसका उपयोग पत्तेदार फसलों में तेज़ वृद्धि के लिए किया जाता है। यह प्रकाश संश्लेषण को बढ़ाती है और मज़बूत तने के विकास में मदद करती है।'
+          : 'Urea is a nitrogen-rich fertilizer used for rapid growth in leafy crops. It enhances photosynthesis and helps in developing strong stems.',
+    },
+    {
+      'icon': Icons.landscape_rounded,
+      'title': isHindi ? 'खेत की तैयारी' : 'Field Preparation',
+      'color': 0xFF5D4037,
+      'content': isHindi
+          ? 'खाद डालने से पहले खेत को 2-3 बार जोतें। सुनिश्चित करें कि मिट्टी नम और अच्छी तरह से सूखी हो। उर्वरता बढ़ाने के लिए जैविक खाद या कम्पोस्ट मिलाएं।'
+          : 'Plough the field 2-3 times before applying fertilizer. Ensure the soil is moist and well-drained. Mix organic manure or compost to improve fertility.',
+    },
+    {
+      'icon': Icons.handyman_rounded,
+      'title': isHindi ? 'कैसे इस्तेमाल करें' : 'How to Apply',
+      'color': 0xFF2E7D32,
+      'content': isHindi
+          ? 'खाद को पानी में घोलकर (अगर पानी में घुलनशील हो) या पौधे की जड़ के चारों ओर समान रूप से डालें। पत्तियों के सीधे संपर्क से बचें।'
+          : 'Dissolve the fertilizer in water (if water-soluble) or spread it evenly around the plant roots. Avoid direct contact with leaves.',
+    },
+    {
+      'icon': Icons.access_time_rounded,
+      'title': isHindi ? 'कब डालें' : 'When to Apply',
+      'color': 0xFFFF8F00,
+      'content': isHindi
+          ? 'प्रारंभिक विकास चरणों में, विशेष रूप से फूल आने से पहले और सिंचाई के बाद अधिकतम पोषक तत्व अवशोषण के लिए डालें।'
+          : 'Apply during early growth stages, especially before flowering and after irrigation, for maximum nutrient absorption.',
+    },
+    {
+      'icon': Icons.warning_amber_rounded,
+      'title': isHindi ? 'कब न डालें' : 'When Not to Apply',
+      'color': 0xFFE53935,
+      'content': isHindi
+          ? 'अत्यधिक गर्मी या भारी बारिश के दौरान खाद का उपयोग न करें। सूखी मिट्टी पर या कटाई के समय न डालें।'
+          : 'Do not use fertilizer during extreme heat or heavy rain. Avoid applying on dry soil or at the time of harvesting.',
+    },
   ];
 
   @override
   Widget build(BuildContext context) {
+    final isHindi = Localizations.localeOf(context).languageCode == 'hi';
     final w = MediaQuery.of(context).size.width;
+    final sections = _buildSections(isHindi);
 
     return Scaffold(
       backgroundColor: _cream,
@@ -40,8 +72,10 @@ class FertilizerDetailPage extends StatelessWidget {
             iconTheme: const IconThemeData(color: Colors.white),
             flexibleSpace: FlexibleSpaceBar(
               centerTitle: true,
-              title: Text('खाद विवरण',
-                  style: GoogleFonts.poppins(fontSize: w * 0.042, fontWeight: FontWeight.w700, color: Colors.white)),
+              title: Text(
+                isHindi ? 'खाद विवरण' : 'Fertilizer Details',
+                style: GoogleFonts.poppins(fontSize: w * 0.042, fontWeight: FontWeight.w700, color: Colors.white),
+              ),
               background: Stack(
                 fit: StackFit.expand,
                 children: [
@@ -95,11 +129,11 @@ class FertilizerDetailPage extends StatelessWidget {
                   // Quick chips
                   Row(
                     children: [
-                      _chip(Icons.science_rounded, 'नाइट्रोजन', const Color(0xFF1565C0)),
+                      _chip(Icons.science_rounded, isHindi ? 'नाइट्रोजन' : 'Nitrogen', const Color(0xFF1565C0)),
                       const SizedBox(width: 10),
-                      _chip(Icons.water_drop_rounded, 'पानी में घुलनशील', const Color(0xFF0288D1)),
+                      _chip(Icons.water_drop_rounded, isHindi ? 'पानी में घुलनशील' : 'Water Soluble', const Color(0xFF0288D1)),
                       const SizedBox(width: 10),
-                      _chip(Icons.eco_rounded, 'फसल वृद्धि', const Color(0xFF2E7D32)),
+                      _chip(Icons.eco_rounded, isHindi ? 'फसल वृद्धि' : 'Crop Growth', const Color(0xFF2E7D32)),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -143,8 +177,10 @@ class FertilizerDetailPage extends StatelessWidget {
                                 color: Colors.black.withValues(alpha: 0.6),
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: Text('▶ खाद के बारे में विडियो देखें',
-                                  style: GoogleFonts.poppins(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w600)),
+                              child: Text(
+                                isHindi ? '▶ खाद के बारे में विडियो देखें' : '▶ Watch Video About Fertilizer',
+                                style: GoogleFonts.poppins(fontSize: 12, color: Colors.white, fontWeight: FontWeight.w600),
+                              ),
                             ),
                           ),
                         ],
@@ -154,7 +190,7 @@ class FertilizerDetailPage extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   // Info sections
-                  ..._sections.map((s) => _infoCard(s, w)),
+                  ...sections.map((s) => _infoCard(s, w)),
                   const SizedBox(height: 12),
                 ],
               ),

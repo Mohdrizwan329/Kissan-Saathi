@@ -44,10 +44,7 @@ class _AlarmPageState extends State<AlarmPage> {
       final prefs = await SharedPreferences.getInstance();
       final data = _alarms.map((e) => jsonEncode(e)).toList();
       await prefs.setStringList('farmer_alarms', data);
-      debugPrint('Alarms saved: ${data.length} items');
-    } catch (e) {
-      debugPrint('Failed to save alarms: $e');
-    }
+    } catch (_) {}
   }
 
   Future<void> _addAlarm() async {
@@ -149,9 +146,7 @@ class _AlarmPageState extends State<AlarmPage> {
         },
       );
       await intent.launch();
-    } catch (e) {
-      debugPrint('Alarm intent error: $e');
-    }
+    } catch (_) {}
   }
 
   Future<void> _deleteAlarm(int index) async {
@@ -180,7 +175,7 @@ class _AlarmPageState extends State<AlarmPage> {
     final w = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFA),
+      backgroundColor: const Color(0xFFE8F5E9),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         flexibleSpace: AppBarStyle.flexibleSpace(),
@@ -258,12 +253,19 @@ class _AlarmPageState extends State<AlarmPage> {
           child: Container(
             margin: const EdgeInsets.only(bottom: 12),
             decoration: BoxDecoration(
-              color: Colors.white,
+              gradient: enabled
+                  ? const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Color(0xFF2E7D32), Color(0xFF66BB6A)],
+                    )
+                  : LinearGradient(
+                      colors: [Colors.grey[300]!, Colors.grey[200]!],
+                    ),
               borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(color: Colors.green.withValues(alpha: 0.08), blurRadius: 10, offset: const Offset(0, 4)),
+              boxShadow: const [
+                BoxShadow(color: Color(0x4C2E7D32), blurRadius: 6, offset: Offset(0, 2)),
               ],
-              border: Border.all(color: enabled ? const Color(0xFFA5D6A7) : Colors.grey[300]!, width: 1),
             ),
             child: Padding(
               padding: EdgeInsets.all(w * 0.04),
@@ -274,7 +276,7 @@ class _AlarmPageState extends State<AlarmPage> {
                     width: w * 0.2,
                     padding: const EdgeInsets.symmetric(vertical: 10),
                     decoration: BoxDecoration(
-                      color: enabled ? const Color(0xFFE8F5E9) : Colors.grey[100],
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
@@ -284,14 +286,14 @@ class _AlarmPageState extends State<AlarmPage> {
                           style: GoogleFonts.poppins(
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
-                            color: enabled ? const Color(0xFF2E7D32) : Colors.grey,
+                            color: Colors.white,
                           ),
                         ),
                         Text(
                           _getPeriod(context, hour),
                           style: GoogleFonts.poppins(
                             fontSize: 11,
-                            color: enabled ? const Color(0xFF43A047) : Colors.grey,
+                            color: Colors.white70,
                           ),
                         ),
                       ],
@@ -308,7 +310,7 @@ class _AlarmPageState extends State<AlarmPage> {
                           style: GoogleFonts.poppins(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: enabled ? Colors.black87 : Colors.grey,
+                            color: Colors.white,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -316,7 +318,7 @@ class _AlarmPageState extends State<AlarmPage> {
                         const SizedBox(height: 2),
                         Text(
                           S.of(context)?.swipeToDelete ?? '← हटाने के लिए स्वाइप करें',
-                          style: GoogleFonts.poppins(fontSize: 10, color: Colors.grey[400]),
+                          style: GoogleFonts.poppins(fontSize: 10, color: Colors.white60),
                         ),
                       ],
                     ),
@@ -324,7 +326,10 @@ class _AlarmPageState extends State<AlarmPage> {
                   // Toggle
                   Switch(
                     value: enabled,
-                    activeColor: const Color(0xFF2E7D32),
+                    activeThumbColor: Colors.white,
+                    activeTrackColor: Colors.white38,
+                    inactiveThumbColor: Colors.white70,
+                    inactiveTrackColor: Colors.white24,
                     onChanged: (val) {
                       setState(() => _alarms[index]['enabled'] = val);
                       _saveAlarms();

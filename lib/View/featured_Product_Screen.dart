@@ -105,14 +105,15 @@ class _FeaturedProductScreenState extends State<FeaturedProductScreen> {
     final size = MediaQuery.of(context).size;
     final w = size.width;
     final h = size.height;
+    final isHindi = Localizations.localeOf(context).languageCode == 'hi';
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: const Color(0xFFE8F5E9),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         flexibleSpace: AppBarStyle.flexibleSpace(),
         title: Text(
-          'Search Crops',
+          isHindi ? 'फसलें खोजें' : 'Search Crops',
           style: GoogleFonts.poppins(
             fontSize: w * 0.05,
             fontWeight: FontWeight.bold,
@@ -123,101 +124,82 @@ class _FeaturedProductScreenState extends State<FeaturedProductScreen> {
         elevation: 0,
         iconTheme: IconThemeData(color: Colors.white),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.all(w * 0.04),
-            child: Material(
-              elevation: 4,
-              borderRadius: BorderRadius.circular(w * 0.04),
-              child: TextField(
-                controller: searchController,
-                onChanged: _filterData,
-                style: GoogleFonts.poppins(
-                  fontSize: w * 0.042,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
+      body: filteredData.isEmpty
+          ? Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(w * 0.04),
+                  child: _searchField(w, h, isHindi),
                 ),
-                cursorColor: Colors.green,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  hintText: "Search crops...",
-                  hintStyle: GoogleFonts.poppins(
-                    color: Colors.grey[600],
-                    fontSize: w * 0.038,
-                  ),
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: Colors.green,
-                    size: w * 0.06,
-                  ),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _isListening ? Icons.mic_off : Icons.mic,
-                      color: _isListening ? Colors.red : Colors.green,
-                      size: w * 0.06,
+                Expanded(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.search_off, size: w * 0.18, color: Colors.grey[400]),
+                        SizedBox(height: h * 0.015),
+                        Text(isHindi ? 'कोई फसल नहीं मिली' : 'No crops found', style: GoogleFonts.poppins(fontSize: w * 0.045, color: Colors.grey[600])),
+                        Text(isHindi ? 'अलग शब्द से खोजें' : 'Try a different search term', style: GoogleFonts.poppins(fontSize: w * 0.035, color: Colors.grey[500])),
+                      ],
                     ),
-                    onPressed: _listen,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(w * 0.04),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding: EdgeInsets.symmetric(
-                    vertical: h * 0.02,
-                    horizontal: w * 0.04,
                   ),
                 ),
-              ),
+              ],
+            )
+          : CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(w * 0.04, w * 0.04, w * 0.04, 12),
+                    child: _searchField(w, h, isHindi),
+                  ),
+                ),
+                SliverPadding(
+                  padding: EdgeInsets.symmetric(horizontal: w * 0.04),
+                  sliver: SliverGrid(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) => _buildProductCard(filteredData[index], w, h),
+                      childCount: filteredData.length,
+                    ),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2, mainAxisSpacing: h * 0.02, crossAxisSpacing: w * 0.04, childAspectRatio: 0.8,
+                    ),
+                  ),
+                ),
+              ],
             ),
+    );
+  }
+
+  Widget _searchField(double w, double h, bool isHindi) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF2E7D32), Color(0xFF66BB6A)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [BoxShadow(color: const Color(0xFF2E7D32).withValues(alpha: 0.30), blurRadius: 8, offset: const Offset(0, 3))],
+      ),
+      child: TextField(
+        controller: searchController,
+        onChanged: _filterData,
+        style: GoogleFonts.poppins(fontSize: w * 0.042, color: Colors.white),
+        cursorColor: Colors.white,
+        decoration: InputDecoration(
+          filled: true, fillColor: Colors.transparent,
+          hintText: isHindi ? 'फसलें खोजें...' : 'Search crops...',
+          hintStyle: GoogleFonts.poppins(color: Colors.white70, fontSize: w * 0.038),
+          prefixIcon: Icon(Icons.search_rounded, color: Colors.white, size: w * 0.06),
+          suffixIcon: IconButton(
+            icon: Icon(_isListening ? Icons.mic_off_rounded : Icons.mic_rounded,
+                color: _isListening ? Colors.red.shade200 : Colors.white, size: w * 0.06),
+            onPressed: _listen,
           ),
-          Expanded(
-            child:
-                filteredData.isEmpty
-                    ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.search_off,
-                            size: w * 0.18,
-                            color: Colors.grey[400],
-                          ),
-                          SizedBox(height: h * 0.015),
-                          Text(
-                            "No crops found",
-                            style: GoogleFonts.poppins(
-                              fontSize: w * 0.045,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          Text(
-                            "Try a different search term",
-                            style: GoogleFonts.poppins(
-                              fontSize: w * 0.035,
-                              color: Colors.grey[500],
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                    : GridView.builder(
-                      padding: EdgeInsets.symmetric(horizontal: w * 0.04),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: h * 0.02,
-                        crossAxisSpacing: w * 0.04,
-                        childAspectRatio: 0.8,
-                      ),
-                      itemCount: filteredData.length,
-                      itemBuilder: (context, index) {
-                        final item = filteredData[index];
-                        return _buildProductCard(item, w, h);
-                      },
-                    ),
-          ),
-        ],
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+          contentPadding: EdgeInsets.symmetric(vertical: h * 0.02, horizontal: w * 0.04),
+        ),
       ),
     );
   }

@@ -113,7 +113,10 @@ class _YojnaPageState extends State<YojnaPage> with SingleTickerProviderStateMix
         if (mounted) setState(() { _schemes = items; _loadingSchemes = false; });
         return;
       }
-      if (mounted) setState(() { _schemesError = 'योजनाएं लोड नहीं हुईं (${res.statusCode})'; _loadingSchemes = false; });
+      if (mounted) {
+        final isH = Localizations.localeOf(context).languageCode == 'hi';
+        setState(() { _schemesError = isH ? 'योजनाएं लोड नहीं हुईं (${res.statusCode})' : 'Failed to load schemes (${res.statusCode})'; _loadingSchemes = false; });
+      }
     } catch (e) {
       if (mounted) setState(() { _schemesError = 'Error: $e'; _loadingSchemes = false; });
     }
@@ -137,7 +140,10 @@ class _YojnaPageState extends State<YojnaPage> with SingleTickerProviderStateMix
         if (mounted) setState(() { _announcements = items; _loadingNews = false; });
         return;
       }
-      if (mounted) setState(() { _newsError = 'डेटा लोड नहीं हुआ (${res.statusCode})'; _loadingNews = false; });
+      if (mounted) {
+        final isH = Localizations.localeOf(context).languageCode == 'hi';
+        setState(() { _newsError = isH ? 'डेटा लोड नहीं हुआ (${res.statusCode})' : 'Failed to load data (${res.statusCode})'; _loadingNews = false; });
+      }
     } catch (e) {
       if (mounted) setState(() { _newsError = 'Error: $e'; _loadingNews = false; });
     }
@@ -148,7 +154,7 @@ class _YojnaPageState extends State<YojnaPage> with SingleTickerProviderStateMix
     final isHindi = Localizations.localeOf(context).languageCode == 'hi';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F4EE),
+      backgroundColor: const Color(0xFFE8F5E9),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         flexibleSpace: AppBarStyle.flexibleSpace(),
@@ -312,10 +318,11 @@ class _YojnaPageState extends State<YojnaPage> with SingleTickerProviderStateMix
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight,
+            colors: [color.withValues(alpha: 0.10), color.withValues(alpha: 0.03)]),
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 3))],
-          border: Border.all(color: color.withValues(alpha: 0.12)),
+          boxShadow: [BoxShadow(color: color.withValues(alpha: 0.12), blurRadius: 8, offset: const Offset(0, 3))],
+          border: Border.all(color: color.withValues(alpha: 0.22)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

@@ -21,9 +21,20 @@ class _ToolListScreenState extends State<ToolListScreen> {
   late stt.SpeechToText _speech;
   bool _isListening = false;
 
-  static const _orange = Color(0xFFE65100);
-  static const _orangeLight = Color(0xFFFFA726);
-  static const _cream = Color(0xFFF6F4EE);
+  static const _cardColors = [
+    [Color(0xFFE65100), Color(0xFFFFA726)],   // orange
+    [Color(0xFF558B2F), Color(0xFF9CCC65)],   // lime green
+    [Color(0xFF4E342E), Color(0xFF8D6E63)],   // brown
+    [Color(0xFF00695C), Color(0xFF26A69A)],   // teal
+    [Color(0xFFF57F17), Color(0xFFFFCA28)],   // golden
+    [Color(0xFF1B5E20), Color(0xFF43A047)],   // dark green
+    [Color(0xFF4E342E), Color(0xFFA1887F)],   // earth brown
+    [Color(0xFF33691E), Color(0xFF8BC34A)],   // crop green
+    [Color(0xFFE65100), Color(0xFFFFA726)],   // orange
+    [Color(0xFF00695C), Color(0xFF4DB6AC)],   // deep teal
+    [Color(0xFF558B2F), Color(0xFF9CCC65)],   // lime green
+    [Color(0xFF4E342E), Color(0xFF8D6E63)],   // brown
+  ];
 
   @override
   void initState() {
@@ -77,7 +88,7 @@ class _ToolListScreenState extends State<ToolListScreen> {
     final s = S.of(context);
 
     return Scaffold(
-      backgroundColor: _cream,
+      backgroundColor: const Color(0xFFE8F5E9),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         flexibleSpace: AppBarStyle.flexibleSpace(),
@@ -86,51 +97,15 @@ class _ToolListScreenState extends State<ToolListScreen> {
         centerTitle: true, elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(w * 0.04, w * 0.04, w * 0.04, 0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 8, offset: const Offset(0, 3))],
-              ),
-              child: TextField(
-                controller: _searchController,
-                onChanged: _onSearch,
-                style: GoogleFonts.poppins(fontSize: w * 0.042, color: Colors.black87),
-                cursorColor: _orange,
-                decoration: InputDecoration(
-                  filled: true, fillColor: Colors.white,
-                  hintText: s?.searchToolsHint ?? 'औजार खोजें...',
-                  hintStyle: GoogleFonts.poppins(color: Colors.grey.shade400, fontSize: w * 0.038),
-                  prefixIcon: Icon(Icons.search_rounded, color: _orange, size: w * 0.06),
-                  suffixIcon: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (_searchController.text.isNotEmpty)
-                        IconButton(
-                          icon: Icon(Icons.clear_rounded, color: Colors.grey.shade400, size: w * 0.05),
-                          onPressed: () { _searchController.clear(); _onSearch(''); },
-                        ),
-                      IconButton(
-                        icon: Icon(_isListening ? Icons.mic_off_rounded : Icons.mic_rounded,
-                            color: _isListening ? Colors.red : _orange, size: w * 0.06),
-                        onPressed: _listen,
-                      ),
-                    ],
-                  ),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-                  contentPadding: EdgeInsets.symmetric(vertical: h * 0.02, horizontal: w * 0.04),
+      body: _filtered.isEmpty
+          ? Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.fromLTRB(w * 0.04, w * 0.04, w * 0.04, 0),
+                  child: _searchField(w, h, s),
                 ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Expanded(
-            child: _filtered.isEmpty
-                ? Center(
+                Expanded(
+                  child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -140,51 +115,102 @@ class _ToolListScreenState extends State<ToolListScreen> {
                             style: GoogleFonts.poppins(fontSize: w * 0.045, fontWeight: FontWeight.w600, color: Colors.grey.shade500)),
                       ],
                     ),
-                  )
-                : GridView.builder(
-                    padding: EdgeInsets.symmetric(horizontal: w * 0.04, vertical: 4),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2, mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 0.78,
-                    ),
-                    itemCount: _filtered.length,
-                    itemBuilder: (ctx, i) => _toolCard(ctx, _filtered[i], w, h, isHindi),
                   ),
+                ),
+              ],
+            )
+          : CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(w * 0.04, w * 0.04, w * 0.04, 12),
+                    child: _searchField(w, h, s),
+                  ),
+                ),
+                SliverPadding(
+                  padding: EdgeInsets.fromLTRB(w * 0.04, 0, w * 0.04, 20),
+                  sliver: SliverGrid(
+                    delegate: SliverChildBuilderDelegate(
+                      (ctx, i) => _toolCard(ctx, _filtered[i], i, w, h, isHindi),
+                      childCount: _filtered.length,
+                    ),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2, mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 1.1,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+
+  Widget _searchField(double w, double h, S? s) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF2E7D32), Color(0xFF66BB6A)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [BoxShadow(color: const Color(0xFF2E7D32).withValues(alpha: 0.30), blurRadius: 8, offset: const Offset(0, 3))],
+      ),
+      child: TextField(
+        controller: _searchController,
+        onChanged: _onSearch,
+        style: GoogleFonts.poppins(fontSize: w * 0.042, color: Colors.white),
+        cursorColor: Colors.white,
+        decoration: InputDecoration(
+          filled: true, fillColor: Colors.transparent,
+          hintText: s?.searchToolsHint ?? 'औजार खोजें...',
+          hintStyle: GoogleFonts.poppins(color: Colors.white70, fontSize: w * 0.038),
+          prefixIcon: Icon(Icons.search_rounded, color: Colors.white, size: w * 0.06),
+          suffixIcon: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (_searchController.text.isNotEmpty)
+                IconButton(
+                  icon: Icon(Icons.clear_rounded, color: Colors.white70, size: w * 0.05),
+                  onPressed: () { _searchController.clear(); _onSearch(''); },
+                ),
+              IconButton(
+                icon: Icon(_isListening ? Icons.mic_off_rounded : Icons.mic_rounded,
+                    color: _isListening ? Colors.red.shade200 : Colors.white, size: w * 0.06),
+                onPressed: _listen,
+              ),
+            ],
           ),
-        ],
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+          contentPadding: EdgeInsets.symmetric(vertical: h * 0.02, horizontal: w * 0.04),
+        ),
       ),
     );
   }
 
-  Widget _toolCard(BuildContext context, ToolInfo tool, double w, double h, bool isHindi) {
+  Widget _toolCard(BuildContext context, ToolInfo tool, int index, double w, double h, bool isHindi) {
+    final colors = _cardColors[index % _cardColors.length];
     return GestureDetector(
       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => ToolDetailScreen(tool: tool))),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 8, offset: const Offset(0, 3))],
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [colors[0], colors[1]],
+          ),
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [BoxShadow(color: colors[0].withValues(alpha: 0.30), blurRadius: 6, offset: const Offset(0, 3))],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: w * 0.2,
-              height: w * 0.2,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [_orange.withValues(alpha: 0.12), _orangeLight.withValues(alpha: 0.2)],
-                ),
-                shape: BoxShape.circle,
-                border: Border.all(color: _orange.withValues(alpha: 0.25), width: 1.5),
-              ),
-              child: Center(child: Text(tool.image, style: TextStyle(fontSize: w * 0.1))),
-            ),
+            Text(tool.image, style: TextStyle(fontSize: w * 0.1)),
             SizedBox(height: h * 0.012),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: w * 0.025),
               child: Text(
                 isHindi ? tool.nameHindi : tool.name,
-                style: GoogleFonts.poppins(fontSize: w * 0.038, fontWeight: FontWeight.w700, color: Colors.black87),
+                style: GoogleFonts.poppins(fontSize: w * 0.038, fontWeight: FontWeight.w700, color: Colors.white),
                 textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -192,22 +218,9 @@ class _ToolListScreenState extends State<ToolListScreen> {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: w * 0.02),
                 child: Text(tool.name,
-                    style: GoogleFonts.poppins(fontSize: w * 0.03, color: Colors.grey.shade500),
+                    style: GoogleFonts.poppins(fontSize: w * 0.03, color: Colors.white70),
                     textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis),
               ),
-            SizedBox(height: h * 0.006),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-              decoration: BoxDecoration(
-                color: _orange.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                isHindi ? tool.priceRangeHindi : tool.priceRange,
-                style: GoogleFonts.poppins(fontSize: w * 0.026, fontWeight: FontWeight.w600, color: _orange),
-                maxLines: 1, overflow: TextOverflow.ellipsis,
-              ),
-            ),
           ],
         ),
       ),

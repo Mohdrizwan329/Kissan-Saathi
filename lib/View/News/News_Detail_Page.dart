@@ -8,7 +8,7 @@ class NewsDetailPage extends StatelessWidget {
 
   static const _green1 = Color(0xFF1B5E20);
   static const _green2 = Color(0xFF388E3C);
-  static const _cream = Color(0xFFF6F4EE);
+  static const _cream = Color(0xFFE8F5E9);
 
   Future<void> _launchUrl(String url) async {
     try {
@@ -29,6 +29,7 @@ class NewsDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isHindi = Localizations.localeOf(context).languageCode == 'hi';
     final w = MediaQuery.of(context).size.width;
     final hasImage = (article['image'] ?? '').toString().isNotEmpty;
 
@@ -135,7 +136,7 @@ class NewsDetailPage extends StatelessWidget {
                             color: const Color(0xFFE8F5E9),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Text('🌾 कृषि समाचार',
+                          child: Text(isHindi ? '🌾 कृषि समाचार' : '🌾 Agriculture News',
                               style: GoogleFonts.poppins(fontSize: 11, color: _green1, fontWeight: FontWeight.w600)),
                         ),
                       ],
@@ -171,7 +172,7 @@ class NewsDetailPage extends StatelessWidget {
                                 decoration: BoxDecoration(color: _green2, borderRadius: BorderRadius.circular(2)),
                               ),
                               const SizedBox(width: 8),
-                              Text('सारांश', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700, color: _green1)),
+                              Text(isHindi ? 'सारांश' : 'Summary', style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w700, color: _green1)),
                             ],
                           ),
                           const SizedBox(height: 10),
@@ -210,7 +211,7 @@ class NewsDetailPage extends StatelessWidget {
                               children: [
                                 const Icon(Icons.open_in_new_rounded, color: Colors.white, size: 18),
                                 const SizedBox(width: 8),
-                                Text('पूरी खबर पढ़ें',
+                                Text(isHindi ? 'पूरी खबर पढ़ें' : 'Read Full Article',
                                     style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
                               ],
                             ),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:indian_farmer/l10n/s.dart';
 import 'package:indian_farmer/Provider/locale_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:indian_farmer/View/Alarm_Page.dart';
@@ -13,18 +14,46 @@ import 'Help_Center_Page.dart';
 import 'Logout_Handler.dart';
 import 'Terms_Privacy_Page.dart';
 
-class ProfilePage extends ConsumerWidget {
+class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key});
 
+  @override
+  ConsumerState<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends ConsumerState<ProfilePage> {
   static const _green1 = Color(0xFF1B5E20);
   static const _green2 = Color(0xFF388E3C);
-  static const _cream = Color(0xFFF6F4EE);
 
-  void _navigate(BuildContext context, Widget page) =>
-      Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+  String _name = 'किसान भाई';
+  String _email = '';
+  String _avatar = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() {
+      _name = prefs.getString('profile_name') ?? '';
+      _email = prefs.getString('profile_email') ?? '';
+      _avatar = prefs.getString('profile_image') ?? '';
+    });
+  }
+
+  void _navigate(BuildContext context, Widget page) async {
+    final result = await Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+    if (result == true) _loadProfile();
+  }
 
   void _shareToWhatsApp(BuildContext context) async {
-    final message = Uri.encodeComponent('Hey! Check out this awesome app: https://example.com');
+    final message = Uri.encodeComponent(
+      'किसान साथी एप डाउनलोड करें — भारतीय किसानों के लिए कृषि सहायक!\nhttps://play.google.com/store/apps/details?id=com.kisansaathi.app',
+    );
     final whatsappUrl = 'whatsapp://send?text=$message';
     try {
       await launchUrl(Uri.parse(whatsappUrl), mode: LaunchMode.externalApplication);
@@ -51,26 +80,28 @@ class ProfilePage extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    const name = 'Mohd Rizwan';
-    const email = 'rizwan@mail.com';
-    const avatar = 'https://i.pravatar.cc/150?img=7';
+  Widget build(BuildContext context) {
+    final name = _name;
+    final email = _email;
+    final avatar = _avatar;
     final w = MediaQuery.of(context).size.width;
     final s = S.of(context);
     final currentLocale = ref.watch(localeProvider);
     final currentLang = currentLocale?.languageCode ?? 'hi';
     final isHindi = currentLang == 'hi';
 
+    final displayName = name.isEmpty ? (isHindi ? 'किसान भाई' : 'Farmer Friend') : name;
+
     return Scaffold(
-      backgroundColor: _cream,
+      backgroundColor: const Color(0xFFE8F5E9),
       body: Column(
         children: [
-          _buildProfileHeader(context, w, name, email, avatar),
+          _buildProfileHeader(context, w, displayName, email, avatar, isHindi),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 20, 16, 24),
               children: [
-                _sectionLabel('खाता / Account'),
+                _sectionLabel(isHindi ? 'खाता' : 'Account'),
                 const SizedBox(height: 8),
                 _menuCard(context, [
                   _MenuItem(Icons.edit_rounded, s?.editProfile ?? 'प्रोफ़ाइल संपादित करें', const Color(0xFF1565C0), () => _navigate(context, const EditProfilePage())),
@@ -85,7 +116,7 @@ class ProfilePage extends ConsumerWidget {
                 _languageCard(context, ref, currentLang, isHindi),
                 const SizedBox(height: 16),
 
-                _sectionLabel('सहायता / Support'),
+                _sectionLabel(isHindi ? 'सहायता' : 'Support'),
                 const SizedBox(height: 8),
                 _menuCard(context, [
                   _MenuItem(Icons.help_rounded, s?.helpCenter ?? 'सहायता केंद्र', const Color(0xFFF57F17), () => _navigate(context, const HelpCenterPage())),
@@ -110,9 +141,11 @@ class ProfilePage extends ConsumerWidget {
       onTap: () => _showLanguagePicker(context, ref, currentLang),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight,
+            colors: [const Color(0xFF1565C0).withValues(alpha: 0.08), const Color(0xFF1565C0).withValues(alpha: 0.02)]),
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 3))],
+          border: Border.all(color: const Color(0xFF1565C0).withValues(alpha: 0.18)),
+          boxShadow: [BoxShadow(color: const Color(0xFF1565C0).withValues(alpha: 0.10), blurRadius: 10, offset: const Offset(0, 3))],
         ),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
@@ -162,7 +195,7 @@ class ProfilePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildProfileHeader(BuildContext context, double w, String name, String email, String avatar) {
+  Widget _buildProfileHeader(BuildContext context, double w, String name, String email, String avatar, bool isHindi) {
     return Container(
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       decoration: const BoxDecoration(
@@ -185,7 +218,18 @@ class ProfilePage extends ConsumerWidget {
                     border: Border.all(color: Colors.white, width: 3),
                     boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 10)],
                   ),
-                  child: ClipOval(child: Image.network(avatar, fit: BoxFit.cover)),
+                  child: ClipOval(
+                    child: avatar.isNotEmpty
+                        ? Image.network(
+                            avatar,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => const Icon(Icons.person_rounded, color: Colors.white, size: 40),
+                          )
+                        : Container(
+                            color: const Color(0xFF2E7D32),
+                            child: const Icon(Icons.person_rounded, color: Colors.white, size: 40),
+                          ),
+                  ),
                 ),
                 Positioned(
                   bottom: 0, right: 0,
@@ -212,7 +256,7 @@ class ProfilePage extends ConsumerWidget {
                       color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text('🌾 किसान', style: GoogleFonts.poppins(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w600)),
+                    child: Text(isHindi ? '🌾 किसान' : '🌾 Farmer', style: GoogleFonts.poppins(fontSize: 11, color: Colors.white, fontWeight: FontWeight.w600)),
                   ),
                 ],
               ),
@@ -231,39 +275,57 @@ class ProfilePage extends ConsumerWidget {
   }
 
   Widget _menuCard(BuildContext context, List<_MenuItem> items) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 3))],
-      ),
-      child: Column(
-        children: List.generate(items.length, (i) {
-          final item = items[i];
-          return Column(
-            children: [
-              ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                leading: Container(
-                  width: 40, height: 40,
-                  decoration: BoxDecoration(
-                    color: item.color.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(item.icon, color: item.color, size: 20),
+    return Column(
+      children: List.generate(items.length, (i) {
+        final item = items[i];
+        final color = item.isDestructive ? Colors.red : item.color;
+        return Container(
+          margin: const EdgeInsets.only(bottom: 10),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [color.withValues(alpha: 0.13), color.withValues(alpha: 0.04)],
+            ),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: color.withValues(alpha: 0.25), width: 1.2),
+            boxShadow: [BoxShadow(color: color.withValues(alpha: 0.12), blurRadius: 8, offset: const Offset(0, 3))],
+          ),
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+            leading: Container(
+              width: 44, height: 44,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [color.withValues(alpha: 0.9), color.withValues(alpha: 0.7)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                title: Text(item.label,
-                    style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600,
-                        color: item.isDestructive ? Colors.red : Colors.black87)),
-                trailing: Icon(Icons.chevron_right_rounded, color: Colors.grey.shade400),
-                onTap: item.onTap,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [BoxShadow(color: color.withValues(alpha: 0.35), blurRadius: 6, offset: const Offset(0, 2))],
               ),
-              if (i < items.length - 1)
-                Divider(height: 1, indent: 16, endIndent: 16, color: Colors.grey.shade100),
-            ],
-          );
-        }),
-      ),
+              child: Icon(item.icon, color: Colors.white, size: 22),
+            ),
+            title: Text(
+              item.label,
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: item.isDestructive ? Colors.red.shade700 : Colors.black87,
+              ),
+            ),
+            trailing: Container(
+              width: 28, height: 28,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.chevron_right_rounded, color: color, size: 18),
+            ),
+            onTap: item.onTap,
+          ),
+        );
+      }),
     );
   }
 }
@@ -284,9 +346,10 @@ class _LanguageBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isHindi = Localizations.localeOf(context).languageCode == 'hi';
     return Container(
       decoration: const BoxDecoration(
-        color: Color(0xFFF6F4EE),
+        color: Color(0xFFE8F5E9),
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -312,9 +375,9 @@ class _LanguageBottomSheet extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('भाषा चुनें / Select Language',
+                    Text(isHindi ? 'भाषा चुनें' : 'Select Language',
                         style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
-                    Text('App की भाषा बदलें',
+                    Text(isHindi ? 'App की भाषा बदलें' : 'Change app language',
                         style: GoogleFonts.poppins(fontSize: 11, color: Colors.white70)),
                   ],
                 ),

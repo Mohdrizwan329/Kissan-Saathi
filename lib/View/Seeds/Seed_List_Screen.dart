@@ -22,22 +22,21 @@ class _SeedListScreenState extends State<SeedListScreen> {
   late stt.SpeechToText _speech;
   bool _isListening = false;
 
-  static const _green = Color(0xFF2E7D32);
-  static const _cream = Color(0xFFF6F4EE);
+  static const _cream = Color(0xFFE8F5E9);
 
   static const _cardColors = [
-    [Color(0xFF43A047), Color(0xFF81C784)],   // green
-    [Color(0xFFFF8F00), Color(0xFFFFD54F)],   // amber
-    [Color(0xFFE53935), Color(0xFFEF9A9A)],   // red
-    [Color(0xFF1E88E5), Color(0xFF90CAF9)],   // blue
-    [Color(0xFF8E24AA), Color(0xFFCE93D8)],   // purple
-    [Color(0xFF00897B), Color(0xFF80CBC4)],   // teal
-    [Color(0xFFF4511E), Color(0xFFFFAB91)],   // deep orange
-    [Color(0xFF039BE5), Color(0xFF81D4FA)],   // light blue
-    [Color(0xFF7CB342), Color(0xFFDCEDC8)],   // light green
-    [Color(0xFFD81B60), Color(0xFFF48FB1)],   // pink
-    [Color(0xFF6D4C41), Color(0xFFBCAAA4)],   // brown
-    [Color(0xFF5E35B1), Color(0xFFB39DDB)],   // deep purple
+    [Color(0xFF1B5E20), Color(0xFF43A047)],   // dark green
+    [Color(0xFFF57F17), Color(0xFFFFCA28)],   // golden yellow
+    [Color(0xFF4E342E), Color(0xFF8D6E63)],   // soil brown
+    [Color(0xFF01579B), Color(0xFF29B6F6)],   // water blue
+    [Color(0xFF2E7D32), Color(0xFF66BB6A)],   // leaf green
+    [Color(0xFF00695C), Color(0xFF26A69A)],   // teal nature
+    [Color(0xFF558B2F), Color(0xFF9CCC65)],   // lime green
+    [Color(0xFF4E342E), Color(0xFFA1887F)],   // earth brown
+    [Color(0xFF1B5E20), Color(0xFF66BB6A)],   // forest green
+    [Color(0xFFF9A825), Color(0xFFFFD54F)],   // harvest yellow
+    [Color(0xFF00695C), Color(0xFF4DB6AC)],   // deep teal
+    [Color(0xFF33691E), Color(0xFF8BC34A)],   // crop green
   ];
 
   @override
@@ -103,51 +102,15 @@ class _SeedListScreenState extends State<SeedListScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(w * 0.04, w * 0.04, w * 0.04, 0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 8, offset: const Offset(0, 3))],
-              ),
-              child: TextField(
-                controller: _searchController,
-                onChanged: _onSearch,
-                style: GoogleFonts.poppins(fontSize: w * 0.042, fontWeight: FontWeight.w500, color: Colors.black87),
-                cursorColor: _green,
-                decoration: InputDecoration(
-                  filled: true, fillColor: Colors.white,
-                  hintText: s?.searchSeedsHint ?? 'बीज खोजें...',
-                  hintStyle: GoogleFonts.poppins(color: Colors.grey.shade400, fontSize: w * 0.038),
-                  prefixIcon: Icon(Icons.search_rounded, color: _green, size: w * 0.06),
-                  suffixIcon: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (_searchController.text.isNotEmpty)
-                        IconButton(
-                          icon: Icon(Icons.clear_rounded, color: Colors.grey.shade400, size: w * 0.05),
-                          onPressed: () { _searchController.clear(); _onSearch(''); },
-                        ),
-                      IconButton(
-                        icon: Icon(_isListening ? Icons.mic_off_rounded : Icons.mic_rounded,
-                            color: _isListening ? Colors.red : _green, size: w * 0.06),
-                        onPressed: _listen,
-                      ),
-                    ],
-                  ),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
-                  contentPadding: EdgeInsets.symmetric(vertical: h * 0.02, horizontal: w * 0.04),
+      body: _filtered.isEmpty
+          ? Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.fromLTRB(w * 0.04, w * 0.04, w * 0.04, 0),
+                  child: _searchField(w, h, s),
                 ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Expanded(
-            child: _filtered.isEmpty
-                ? Center(
+                Expanded(
+                  child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -157,17 +120,74 @@ class _SeedListScreenState extends State<SeedListScreen> {
                             style: GoogleFonts.poppins(fontSize: w * 0.045, fontWeight: FontWeight.w600, color: Colors.grey.shade500)),
                       ],
                     ),
-                  )
-                : GridView.builder(
-                    padding: EdgeInsets.symmetric(horizontal: w * 0.04, vertical: 4),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2, mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 0.78,
-                    ),
-                    itemCount: _filtered.length,
-                    itemBuilder: (ctx, i) => _seedCard(ctx, _filtered[i], i, w, h, isHindi),
                   ),
+                ),
+              ],
+            )
+          : CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(w * 0.04, w * 0.04, w * 0.04, 12),
+                    child: _searchField(w, h, s),
+                  ),
+                ),
+                SliverPadding(
+                  padding: EdgeInsets.fromLTRB(w * 0.04, 0, w * 0.04, 20),
+                  sliver: SliverGrid(
+                    delegate: SliverChildBuilderDelegate(
+                      (ctx, i) => _seedCard(ctx, _filtered[i], i, w, h, isHindi),
+                      childCount: _filtered.length,
+                    ),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2, mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 1.1,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+
+  Widget _searchField(double w, double h, S? s) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF2E7D32), Color(0xFF66BB6A)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [BoxShadow(color: const Color(0xFF2E7D32).withValues(alpha: 0.30), blurRadius: 8, offset: const Offset(0, 3))],
+      ),
+      child: TextField(
+        controller: _searchController,
+        onChanged: _onSearch,
+        style: GoogleFonts.poppins(fontSize: w * 0.042, fontWeight: FontWeight.w500, color: Colors.white),
+        cursorColor: Colors.white,
+        decoration: InputDecoration(
+          filled: true, fillColor: Colors.transparent,
+          hintText: s?.searchSeedsHint ?? 'बीज खोजें...',
+          hintStyle: GoogleFonts.poppins(color: Colors.white70, fontSize: w * 0.038),
+          prefixIcon: Icon(Icons.search_rounded, color: Colors.white, size: w * 0.06),
+          suffixIcon: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (_searchController.text.isNotEmpty)
+                IconButton(
+                  icon: Icon(Icons.clear_rounded, color: Colors.white70, size: w * 0.05),
+                  onPressed: () { _searchController.clear(); _onSearch(''); },
+                ),
+              IconButton(
+                icon: Icon(_isListening ? Icons.mic_off_rounded : Icons.mic_rounded,
+                    color: _isListening ? Colors.red.shade200 : Colors.white, size: w * 0.06),
+                onPressed: _listen,
+              ),
+            ],
           ),
-        ],
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+          contentPadding: EdgeInsets.symmetric(vertical: h * 0.02, horizontal: w * 0.04),
+        ),
       ),
     );
   }
@@ -178,62 +198,34 @@ class _SeedListScreenState extends State<SeedListScreen> {
       onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => SeedDetailScreen(seed: seed))),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 8, offset: const Offset(0, 3))],
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [colors[0], colors[1]],
+          ),
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [BoxShadow(color: colors[0].withValues(alpha: 0.30), blurRadius: 6, offset: const Offset(0, 3))],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: w * 0.2,
-              height: w * 0.2,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [colors[0].withValues(alpha: 0.18), colors[1].withValues(alpha: 0.30)],
-                ),
-                shape: BoxShape.circle,
-                border: Border.all(color: colors[0].withValues(alpha: 0.40), width: 1.5),
-              ),
-              child: seed.image.startsWith('http')
-                  ? Padding(
-                      padding: EdgeInsets.all(w * 0.025),
-                      child: CachedNetworkImage(
-                        imageUrl: seed.image,
-                        placeholder: (_, __) => Center(child: CircularProgressIndicator(strokeWidth: 2, color: colors[0])),
-                        errorWidget: (_, __, ___) => Icon(Icons.grass_rounded, color: colors[0]),
-                        fit: BoxFit.contain,
-                      ),
-                    )
-                  : Center(child: Text(seed.image, style: TextStyle(fontSize: w * 0.09))),
-            ),
-            SizedBox(height: h * 0.012),
+            seed.image.startsWith('http')
+                ? CachedNetworkImage(
+                    imageUrl: seed.image,
+                    width: w * 0.12,
+                    height: w * 0.12,
+                    placeholder: (_, __) => const CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    errorWidget: (_, __, ___) => Text('🌾', style: TextStyle(fontSize: w * 0.1)),
+                    fit: BoxFit.contain,
+                  )
+                : Text(seed.image, style: TextStyle(fontSize: w * 0.1)),
+            const SizedBox(height: 6),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: w * 0.025),
               child: Text(
                 isHindi ? seed.nameHindi : seed.name,
-                style: GoogleFonts.poppins(fontSize: w * 0.04, fontWeight: FontWeight.w700, color: Colors.black87),
-                textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            if (isHindi)
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: w * 0.02),
-                child: Text(seed.name,
-                    style: GoogleFonts.poppins(fontSize: w * 0.03, color: Colors.grey.shade500),
-                    textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis),
-              ),
-            SizedBox(height: h * 0.006),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-              decoration: BoxDecoration(
-                color: colors[0].withValues(alpha: 0.10),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                isHindi ? seed.seasonHindi : seed.season,
-                style: GoogleFonts.poppins(fontSize: w * 0.026, fontWeight: FontWeight.w600, color: colors[0]),
-                maxLines: 1, overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.poppins(fontSize: w * 0.038, fontWeight: FontWeight.w700, color: Colors.white),
+                textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
